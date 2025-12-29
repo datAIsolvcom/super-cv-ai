@@ -27,6 +27,38 @@ services:
     networks:
       - app-network
 
+  backend:
+    container_name: supercv_backend
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3000' 
+    environment:
+      - DATABASE_URL=postgresql://user123:password123@postgres:5432/supercv?schema=public  
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app-network
+
+
+  frontend:
+    container_name: supercv_frontend
+    build:
+      context: ./apps/frontend 
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001 
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
 volumes:
   postgres_data:
 

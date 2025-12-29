@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { AnalyzeCvDto, WebhookResultDto } from './dto/analyze-cv.dto';
+import { AnalyzeCvDto } from './dto/analyze-cv.dto';
 import { CvStatus } from '@prisma/client';
 
 @Injectable()
@@ -14,29 +14,54 @@ export class CvService {
     @InjectQueue('cv_queue') private cvQueue: Queue,
   ) {}
 
-  async requestAnalysis(dto: AnalyzeCvDto, userId: string | null = null) {
-    let mode = 'general';
-    if (dto.jobDescriptionUrl) mode = 'url_match';
-    else if (dto.jobDescriptionText) mode = 'text_match';
+  async processCvUpload(
+    file: Express.Multer.File, 
+    dto: AnalyzeCvDto, 
+    userId: string | null
+  ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+
+    if (userId) {
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (user && user.credits <= 0) {
+        throw new BadRequestException('Insufficient credits');
+      }
+  
+      if (user) {
+        await this.prisma.user.update({
+          where: { id: userId },
+          data: { credits: { decrement: 1 } },
+        });
+      }
+    }
+
+
+    const mockFileKey = `uploads/${Date.now()}_${file.originalname}`;
+
 
     const cv = await this.prisma.cV.create({
       data: {
         userId: userId, 
-        fileKey: dto.fileKey,
+        fileUrl: mockFileKey,
         status: CvStatus.PENDING,
+        jobContext: {
+          text: dto.jobDescriptionText,
+          url: dto.jobDescriptionUrl
+        } as any, 
       },
     });
 
-  
     await this.cvQueue.add(
       'analyze_job',
       {
         cvId: cv.id,
-        fileKey: dto.fileKey,
+        fileKey: mockFileKey,
         jobContext: {
           text: dto.jobDescriptionText,
           url: dto.jobDescriptionUrl,
-          mode: mode,
         },
       },
       {
@@ -45,25 +70,12 @@ export class CvService {
       },
     );
 
-    this.logger.log(`Analysis requested for CV ${cv.id} [Guest: ${!userId}]`);
+    this.logger.log(`CV ${cv.id} queued for analysis. User: ${userId || 'Guest'}`);
 
-    return { cvId: cv.id, status: 'QUEUED' };
-  }
-
-  async handleWebhook(payload: WebhookResultDto) {
-    const { cvId, result, status } = payload;
-
-    const dbStatus = status === 'COMPLETED' ? CvStatus.COMPLETED : CvStatus.FAILED;
-
-    const updatedCv = await this.prisma.cV.update({
-      where: { id: cvId },
-      data: {
-        status: dbStatus,
-        analysisResult: result, 
-      },
-    });
-
-    this.logger.log(`Webhook received for CV ${cvId}. Status: ${dbStatus}`);
-    return updatedCv;
+    return { 
+      cvId: cv.id, 
+      status: 'QUEUED', 
+      creditsRemaining: userId ? 'calculated_later' : 'N/A' 
+    };
   }
 }

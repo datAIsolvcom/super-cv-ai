@@ -1,7 +1,7 @@
-export { default } from "next-auth/middleware";
+import { auth } from "@/lib/auth";
+
+export default auth;
 
 export const config = {
-  // Protect dashboard routes.
-  // The 'analyze' route is excluded so Guests can still see it.
-  matcher: ["/dashboard/:path*"], 
+  matcher: ["/dashboard/:path*"],
 };

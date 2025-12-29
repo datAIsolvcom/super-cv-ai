@@ -1,23 +1,30 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import { 
+  Body, 
+  Controller, 
+  Post, 
+  UploadedFile, 
+  UseInterceptors, 
+  Headers,
+  BadRequestException
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CvService } from './cv.service';
-import { AnalyzeCvDto, WebhookResultDto } from './dto/analyze-cv.dto';
+import { AnalyzeCvDto } from './dto/analyze-cv.dto';
 
 @Controller('cv')
 export class CvController {
   constructor(private readonly cvService: CvService) {}
 
-  // PUBLIC ENDPOINT
   @Post('analyze')
-  @HttpCode(HttpStatus.ACCEPTED) 
-  async analyze(@Body() analyzeCvDto: AnalyzeCvDto) {
-    const guestUserId = null; 
-    
-    return this.cvService.requestAnalysis(analyzeCvDto, guestUserId);
-  }
+  @UseInterceptors(FileInterceptor('file'))
+  async analyze(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: AnalyzeCvDto,
+    @Headers('userId') userIdHeader: string 
+  ) {
 
-  // INTERNAL WEBHOOK (Python Engine calls this)
-  @Post('webhook')
-  async webhook(@Body() payload: WebhookResultDto) {
-    return this.cvService.handleWebhook(payload);
+    const userId = userIdHeader && userIdHeader !== 'null' ? userIdHeader : null;
+
+    return this.cvService.processCvUpload(file, dto, userId);
   }
 }
