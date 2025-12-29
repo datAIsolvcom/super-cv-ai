@@ -1,0 +1,11 @@
+# 1. Environment Variables 
+.env
+
+# 2. Virtual Environment
+venv/
+env/
+.venv/
+
+# 3. Python Bytecode (Cache otomatis)
+__pycache__/
+*.pyc
