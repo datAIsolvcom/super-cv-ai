@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { AuthProvider } from "@/components/providers/AuthProvider"; 
 import { CvProvider } from "@/lib/cv-context"; 
 import { Navbar } from "@/components/Navbar"; 
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -33,6 +34,7 @@ export default function RootLayout({
 
             <main className="pt-24 min-h-screen">
               {children}
+              <Toaster position="top-center" richColors theme="dark" />
             </main>
             
           </CvProvider>

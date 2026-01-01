@@ -6,25 +6,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, ArrowLeft, Chrome } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
+import { toast } from "sonner"; 
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams(); 
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
-  const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (isLogin) {
-   
+    try {
+     
       const res = await signIn("credentials", { 
         redirect: false, 
         email, 
@@ -32,36 +30,19 @@ function LoginForm() {
       });
       
       if (res?.error) {
-        alert("Invalid Email or Password");
+        
+        toast.error("Invalid Email or Password");
         setIsLoading(false);
       } else {
-    
-        router.push(callbackUrl);
-        router.refresh();
-      }
-    } else {
-
-      try {
-        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-        const res = await fetch(`${backendUrl}/auth/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
-        });
-
-        if (!res.ok) throw new Error(await res.text());
-
-       
-        await signIn("credentials", { redirect: false, email, password });
         
+        toast.success("Welcome back!");
         
         router.push(callbackUrl);
         router.refresh();
-
-      } catch (error: any) {
-        alert("Registration Failed: " + error.message);
-        setIsLoading(false);
       }
+    } catch (error) {
+      toast.error("An unexpected error occurred.");
+      setIsLoading(false);
     }
   };
 
@@ -77,18 +58,15 @@ function LoginForm() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl">
         <Link href="/" className="inline-flex items-center text-slate-500 hover:text-amber-400 mb-6 text-sm transition-colors"><ArrowLeft size={16} className="mr-1"/> Back to Home</Link>
         
-        <h1 className="text-2xl font-serif font-bold text-white mb-2 text-center">{isLogin ? "Welcome Back" : "Join Super CV"}</h1>
-        <p className="text-slate-400 text-sm text-center mb-8">{isLogin ? "Sign in to continue." : "Create an account to start analyzing."}</p>
+        <h1 className="text-2xl font-serif font-bold text-white mb-2 text-center">Welcome Back</h1>
+        <p className="text-slate-400 text-sm text-center mb-8">Sign in to continue.</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <input type="text" placeholder="Full Name" required className="w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white focus:border-amber-500/50 outline-none transition-all" value={name} onChange={e => setName(e.target.value)} />
-          )}
           <input type="email" placeholder="Email Address" required className="w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white focus:border-amber-500/50 outline-none transition-all" value={email} onChange={e => setEmail(e.target.value)} />
           <input type="password" placeholder="Password" required className="w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-white focus:border-amber-500/50 outline-none transition-all" value={password} onChange={e => setPassword(e.target.value)} />
 
           <button disabled={isLoading} className="w-full bg-amber-500 text-slate-900 font-bold h-12 rounded-xl hover:bg-amber-400 transition-colors flex items-center justify-center">
-            {isLoading ? <Loader2 className="animate-spin" /> : (isLogin ? "Sign In" : "Create Account")}
+            {isLoading ? <Loader2 className="animate-spin" /> : "Sign In"}
           </button>
         </form>
 
@@ -103,15 +81,15 @@ function LoginForm() {
         </button>
 
         <p className="mt-6 text-center text-sm text-slate-400">
-          <button onClick={() => setIsLogin(!isLogin)} className="text-amber-400 hover:underline">
-            {isLogin ? "New here? Create an account" : "Already have an account? Sign In"}
-          </button>
+          New here?{" "}
+          <Link href="/register" className="text-amber-400 hover:underline">
+            Create an account
+          </Link>
         </p>
       </motion.div>
     </div>
   );
 }
-
 
 export default function LoginPage() {
   return (

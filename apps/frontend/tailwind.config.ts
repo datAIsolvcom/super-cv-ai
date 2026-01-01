@@ -1,37 +1,54 @@
 import type { Config } from "tailwindcss";
-import { fontFamily } from "tailwindcss/defaultTheme";
 
 const config: Config = {
-  darkMode: ["class"],
   content: [
-    "./src/app/**/*.{ts,tsx}",
-    "./src/components/**/*.{ts,tsx}",
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: "class",
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter)", ...fontFamily.sans],
-        serif: ["var(--font-playfair)", ...fontFamily.serif],
+        sans: ["var(--font-inter)", "sans-serif"],
+        serif: ["var(--font-playfair)", "serif"], 
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+      colors: {
+       
+        obsidian: {
+          900: "#0f172a", 
+          950: "#020617", 
+        },
+        // Palette: Champagne Gold
+        champagne: {
+          100: "#fef3c7",
+          300: "#fcd34d",
+          500: "#f59e0b", 
+          700: "#b45309",
+        }
       },
       backgroundImage: {
-        "luxury-gradient":
-          "linear-gradient(to right, oklch(0.129 0.042 264.695), oklch(0.208 0.042 265.755))",
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'glass-gradient': 'linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+        'gold-gradient': 'linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)',
       },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' }
+        }
+      }
     },
   },
   plugins: [],
 };
-
 export default config;
