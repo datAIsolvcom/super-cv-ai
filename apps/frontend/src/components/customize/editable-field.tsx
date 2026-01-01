@@ -16,7 +16,7 @@ export function EditableField({ value, onSave, className, tagName = "div", place
   const [content, setContent] = useState(value);
   const containerRef = useRef<HTMLElement>(null);
 
-  // Sync state internal jika props value berubah (misal dari AI Suggestion)
+  
   useEffect(() => {
     if (value !== containerRef.current?.innerHTML) {
         setContent(value);
@@ -26,7 +26,7 @@ export function EditableField({ value, onSave, className, tagName = "div", place
   const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
     const html = e.currentTarget.innerHTML;
     if (html !== value) {
-        onSave(html); // Simpan ke context saat lepas fokus
+        onSave(html); 
     }
   };
 

@@ -16,9 +16,7 @@ export function RibbonBar() {
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showLayoutPicker, setShowLayoutPicker] = useState(false);
 
-  // --- FIX UTAMA DISINI: DEFINISIKAN PAGE STYLE ---
-  // Kita set margin fisik kertas 15mm untuk Atas/Bawah
-  // Kiri/Kanan 0mm (biar diatur oleh padding design Anda)
+
   const pageStyle = `
     @page {
       size: auto;
@@ -43,13 +41,11 @@ export function RibbonBar() {
   const handlePrint = useReactToPrint({
     contentRef: printRef, 
     documentTitle: "My_CV_Optimized",
-    // Masukkan style tadi kesini
     pageStyle: pageStyle,
     onAfterPrint: () => console.log("Printed successfully"),
   });
 
-  // ... (Sisa kode ke bawah SAMA PERSIS, tidak ada yang berubah) ...
-  // Copy dari kode sebelumnya mulai dari const colors = ... sampai return
+  
   
   const colors = ['#000000', '#2563eb', '#dc2626', '#16a34a', '#d97706', '#7c3aed', '#db2777'];
   const fonts = [

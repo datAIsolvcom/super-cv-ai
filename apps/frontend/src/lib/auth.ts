@@ -36,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id; // Default ID
         
-        // If Google Login, Sync to get real DB UUID
+    
         if (account?.provider === "google") {
           try {
              const backendUrl = "http://127.0.0.1:3001";
@@ -51,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
              });
              if (res.ok) {
                const dbUser = await res.json();
-               token.id = dbUser.id; // Override with UUID
+               token.id = dbUser.id; 
                token.credits = dbUser.credits;
              }
           } catch (e) { console.error("Sync failed", e); }
@@ -67,5 +67,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   session: { strategy: "jwt" },
-  pages: { signIn: "/login" }, // <--- THIS LINE IS CRITICAL
+  pages: { signIn: "/login" }, 
 });

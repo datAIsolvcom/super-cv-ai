@@ -9,12 +9,12 @@ import { motion, AnimatePresence } from "framer-motion";
 export function EditorLayout() {
   const { aiDraft, cvData, applySuggestion, setView } = useCv();
   
-  // State untuk menyimpan ID saran yang sudah di-apply
+ 
   const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
 
   if (!aiDraft || !cvData) return null;
 
-  // --- LOGIC SCORING (FINAL FIX FOR SAME COMPANY) ---
+  
   const findBestMatchIndex = (aiItem: any, userList: any[], aiIndex: number) => {
       if (!userList || userList.length === 0) return -1;
 
@@ -24,7 +24,7 @@ export function EditorLayout() {
       userList.forEach((userItem, userIndex) => {
           let score = 0;
           
-          // Normalisasi string (kecilkan huruf, hapus spasi berlebih)
+        
           const cleanString = (str: string) => str?.toLowerCase().replace(/\s+/g, ' ').trim() || "";
           
           const aiCo = cleanString(aiItem.company);
@@ -32,59 +32,50 @@ export function EditorLayout() {
           const aiTitle = cleanString(aiItem.title);
           const userTitle = cleanString(userItem.title);
 
-          // 1. CEK PERUSAHAAN (Wajib Sama)
+       
           if (aiCo === userCo) {
-              score += 10; // Modal awal
+              score += 10; 
 
-              // 2. CEK JUDUL (BOBOT TERTINGGI: +50)
-              // Logika: Jika Judul mengandung kata yang sama (misal "Software Engineer" ada di "Software Engineer Intern")
+            
               if (aiTitle && userTitle) {
                   if (aiTitle === userTitle) {
-                      score += 50; // Sama persis
+                      score += 50; 
                   } 
                   else if (userTitle.includes(aiTitle) || aiTitle.includes(userTitle)) {
-                      score += 30; // Mirip
+                      score += 30; 
                   }
               }
 
-              // 3. CEK URUTAN/INDEX (BOBOT MENENGAH: +20)
-              // Ini penyelamat jika nama PT sama persis.
-              // Software Engineer (Index 1) akan lebih memilih Index 1 (+20 poin) daripada Index 0.
               if (userIndex === aiIndex) {
                   score += 20;
               }
           }
 
-          // Update Pemenang jika skor lebih tinggi
+ 
           if (score > maxScore) {
               maxScore = score;
               bestIndex = userIndex;
           }
       });
 
-      // SYARAT MINIMAL: Skor > 10
-      // Artinya minimal Nama Perusahaan harus sama. 
-      // Jika cuma beda judul tapi PT sama, dia akan ambil yang skornya paling tinggi (karena faktor Index).
+      
       if (maxScore <= 10 && bestIndex !== -1) {
-         // Edge Case: Jika PT sama tapi Judul Beda Total, dan Index Beda Total.
-         // Kita cek ulang, jangan sampai salah timpa.
-         // Tapi karena kita pakai MaxScore, dia akan otomatis ambil yang "paling mending".
+         
       }
 
       return maxScore > 0 ? bestIndex : -1;
   };
 
   const handleApply = (type: string, id: string | number, data: any, originalIndex: number) => {
-      // 1. Update Context
+     
       if (type === 'hard_skills') {
           applySuggestion('hard_skills', data);
       } else if (type === 'professional_summary') {
           applySuggestion('professional_summary', data);
       } else {
-          // Array items (Experience, Projects, etc)
+        
           const currentList = (cvData as any)[type] || [];
-          
-          // Cari item target dengan logika Scoring baru
+ 
           const targetIndex = findBestMatchIndex(data, currentList, originalIndex);
 
           if (targetIndex !== -1) {
@@ -94,7 +85,6 @@ export function EditorLayout() {
           }
       }
 
-      // 2. Hide Card
       setAppliedIds(prev => new Set(prev).add(`${type}-${id}`));
   };
 
@@ -105,7 +95,7 @@ export function EditorLayout() {
   return (
     <div className="flex h-screen w-full bg-slate-950 overflow-hidden">
        
-       {/* SIDEBAR */}
+   
        <div className="w-[400px] border-r border-white/10 bg-slate-900/80 backdrop-blur-md flex flex-col z-20">
           <div className="p-6 border-b border-white/10 flex justify-between items-center">
              <div>
@@ -118,7 +108,7 @@ export function EditorLayout() {
           <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
              <AnimatePresence mode="popLayout">
                 
-                {/* 1. SUMMARY */}
+              
                 {!appliedIds.has('professional_summary-0') && aiDraft.professional_summary !== cvData.professional_summary && (
                     <SuggestionCard 
                         key="summary-card"
@@ -128,7 +118,7 @@ export function EditorLayout() {
                     />
                 )}
 
-                {/* 2. SKILLS */}
+             
                 {missingSkills.length > 0 && (
                     <motion.div 
                         key="skills-card"
@@ -151,15 +141,14 @@ export function EditorLayout() {
                     </motion.div>
                 )}
 
-                {/* 3. WORK EXPERIENCE */}
+          
                 {(aiDraft.work_experience || []).map((aiExp, idx) => {
                     const cardKey = `work_experience-${idx}`;
                     if (appliedIds.has(cardKey)) return null;
 
-                    // Cek apakah item ini relevan
+                   
                     const matchIndex = findBestMatchIndex(aiExp, cvData.work_experience || [], idx);
 
-                    // Tampilkan hanya jika ada match
                     if (matchIndex !== -1) {
                         return (
                             <SuggestionCard
@@ -179,7 +168,6 @@ export function EditorLayout() {
 
              </AnimatePresence>
 
-             {/* Pesan Selesai */}
              {missingSkills.length === 0 && 
               (aiDraft.work_experience || []).every((aiExp, idx) => {
                   const key = `work_experience-${idx}`;
@@ -194,7 +182,7 @@ export function EditorLayout() {
           </div>
        </div>
 
-       {/* MAIN EDITOR */}
+
        <div className="flex-1 bg-slate-950 relative overflow-hidden flex flex-col">
           <div className="flex-1 overflow-y-auto bg-slate-900/50 flex justify-center">
              <div className="py-10"> 

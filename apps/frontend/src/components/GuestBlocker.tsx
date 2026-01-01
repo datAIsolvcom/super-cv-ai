@@ -1,6 +1,6 @@
 "use client";
 import { Lock } from "lucide-react";
-import { Button } from "@/components/ui/button"; // Assuming Shadcn Button
+import { Button } from "@/components/ui/button"; 
 
 interface GuestBlockerProps {
   isGuest: boolean;
@@ -12,12 +12,12 @@ export const GuestBlocker = ({ isGuest, children }: GuestBlockerProps) => {
 
   return (
     <div className="relative overflow-hidden rounded-xl">
-      {/* The Content (Blurred) */}
+      
       <div className="blur-md select-none pointer-events-none opacity-50 transition-all duration-500">
         {children}
       </div>
 
-      {/* The Overlay */}
+     
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-gradient-to-b from-transparent to-slate-950/90">
         <div className="bg-slate-900/80 backdrop-blur-xl border border-amber-500/30 p-6 rounded-2xl shadow-2xl text-center max-w-sm mx-4">
           <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4">

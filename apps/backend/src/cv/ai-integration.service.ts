@@ -1,7 +1,7 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import FormData from 'form-data'; // Pastikan import * as FormData
+import FormData from 'form-data'; 
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -16,14 +16,13 @@ export class AiIntegrationService {
     this.aiEngineUrl = this.configService.get<string>('AI_ENGINE_URL') || 'http://localhost:8000';
   }
 
-  // --- 1. ANALYZE ---
+
   async analyzeCv(fileBuffer: Buffer, filename: string, jobContext: any) {
     try {
       const formData = new FormData();
       formData.append('file', fileBuffer, { filename });
 
-      // Handle Job Context (Text atau URL)
-      // Pastikan format jobContext sesuai dengan yang dikirim dari Service/Controller
+    
       if (typeof jobContext === 'string') {
           formData.append('job_description', jobContext);
       } else if (jobContext?.text) {
@@ -41,26 +40,26 @@ export class AiIntegrationService {
         }),
       );
 
-      return data; // { analysis: ..., cv_data: ... }
+      return data; 
     } catch (error) {
       this.handleError(error);
     }
   }
 
-  // --- 2. CUSTOMIZE (Update agar sesuai Python) ---
+
   async customizeCv(fileBuffer: Buffer, filename: string, mode: string, contextData: any) {
     try {
       const formData = new FormData();
       formData.append('file', fileBuffer, { filename });
       formData.append('mode', mode);
 
-      // Logic payload sesuai endpoint Python /api/customize
+      
       if (mode === 'analysis') {
-        // Jika context adalah object JSON, stringify dulu
+        
         const contextStr = typeof contextData === 'string' ? contextData : JSON.stringify(contextData);
         formData.append('analysis_context', contextStr);
       } else {
-        // Mode job_desc
+       
         const jobStr = typeof contextData === 'string' ? contextData : (contextData?.text || '');
         formData.append('job_description', jobStr);
       }
@@ -74,7 +73,7 @@ export class AiIntegrationService {
         }),
       );
 
-      return data; // ImprovedCVResult JSON
+      return data;
     } catch (error) {
       this.handleError(error);
     }

@@ -10,10 +10,8 @@ export default function AnalyzePage() {
   const cvId = params.id as string;
   const router = useRouter();
 
-  // Panggil Hook Polling
   const { pollingStatus, error } = useCvPolling(cvId);
 
-  // 1. STATE: LOADING / PROCESSING
   if (pollingStatus === 'PENDING' || pollingStatus === 'PROCESSING') {
       return (
           <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white gap-4">
@@ -27,7 +25,6 @@ export default function AnalyzePage() {
       );
   }
 
-  // 2. STATE: ERROR
   if (pollingStatus === 'FAILED' || error) {
       return (
           <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-red-400 gap-4">
@@ -39,7 +36,6 @@ export default function AnalyzePage() {
       );
   }
 
-  // 3. STATE: COMPLETED (Tampilkan View)
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-12">
        <AnalysisView />

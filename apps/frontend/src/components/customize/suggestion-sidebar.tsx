@@ -1,6 +1,5 @@
 "use client";
 
-// 1. Tambahkan import CvData dari context
 import { useCv, CvData } from "@/lib/cv-context";
 import { Sparkles, Check, X } from "lucide-react";
 import { useState } from "react"; 
@@ -14,8 +13,7 @@ interface SuggestionSidebarProps {
 export function SuggestionSidebar({ optimizedData, analysisData, onClose }: SuggestionSidebarProps) {
   const { applySuggestion, cvData } = useCv();
 
-  // --- PERBAIKAN DISINI ---
-  // Ubah tipe 'section' dari 'string' menjadi 'keyof CvData'
+
   const handleApply = (section: keyof CvData, content: any) => {
     applySuggestion(section, content);
   };
@@ -31,28 +29,27 @@ export function SuggestionSidebar({ optimizedData, analysisData, onClose }: Sugg
 
       <div className="space-y-4">
         
-        {/* INFO CARD */}
+  
         <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-lg text-xs text-amber-200/80 mb-4">
           AI has rewritten your CV based on the analysis. Review and click <b>Apply</b> to update your editor.
         </div>
 
-        {/* 1. SUGGESTION: SUMMARY */}
         {optimizedData.professional_summary !== cvData?.professional_summary && (
           <SuggestionCard 
             title="Professional Summary"
             oldVal={cvData?.professional_summary}
             newVal={optimizedData.professional_summary}
-            // Key 'professional_summary' valid karena ada di CvData
+            
             onApply={() => handleApply('professional_summary', optimizedData.professional_summary)}
           />
         )}
 
-        {/* 2. SUGGESTION: SKILLS */}
+  
         <div className="bg-slate-950 border border-white/5 rounded-xl p-4">
              <div className="flex justify-between items-center mb-2">
                 <h4 className="font-semibold text-slate-200 text-sm">Skills Enhancement</h4>
                 <button 
-                    // Key 'hard_skills' valid
+                   
                     onClick={() => handleApply('hard_skills', optimizedData.hard_skills)}
                     className="text-xs bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-full flex items-center gap-1 transition-all"
                 >
@@ -71,12 +68,12 @@ export function SuggestionSidebar({ optimizedData, analysisData, onClose }: Sugg
              </div>
         </div>
 
-        {/* 3. SUGGESTION: EXPERIENCE */}
+
         <div className="bg-slate-950 border border-white/5 rounded-xl p-4">
             <div className="flex justify-between items-center mb-2">
                 <h4 className="font-semibold text-slate-200 text-sm">Work Experience</h4>
                  <button 
-                    // Key 'work_experience' valid
+                    
                     onClick={() => handleApply('work_experience', optimizedData.work_experience)}
                     className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-full flex items-center gap-1 transition-all"
                 >
@@ -93,7 +90,7 @@ export function SuggestionSidebar({ optimizedData, analysisData, onClose }: Sugg
   );
 }
 
-// Sub-Component Kartu
+
 function SuggestionCard({ title, oldVal, newVal, onApply }: any) {
     const [applied, setApplied] = useState(false);
 
@@ -111,8 +108,7 @@ function SuggestionCard({ title, oldVal, newVal, onApply }: any) {
                     {applied ? "Applied" : <><Check size={12}/> Apply</>}
                 </button>
             </div>
-            
-            {/* New Version */}
+
             <div className="mb-2">
                 <div className="text-[10px] uppercase tracking-wider text-emerald-500 font-bold mb-1">AI Suggestion</div>
                 <div className="text-xs text-slate-300 bg-emerald-950/20 p-2 rounded border border-emerald-500/20 line-clamp-4">
@@ -120,7 +116,6 @@ function SuggestionCard({ title, oldVal, newVal, onApply }: any) {
                 </div>
             </div>
 
-            {/* Old Version (Collapsed/Small) */}
             <div className="opacity-60">
                 <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">Original</div>
                  <div className="text-xs text-slate-500 line-clamp-2">

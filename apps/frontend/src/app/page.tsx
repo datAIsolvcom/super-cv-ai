@@ -7,21 +7,18 @@ import { AnalysisView } from "@/components/core/AnalysisView";
 import { EditorLayout } from "@/components/core/EditorLayout";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Kita butuh wrapper agar bisa pakai useCv()
+
 function DashboardContent() {
   const { view, setFile } = useCv() as any; 
-  // NOTE: Jangan lupa tambahkan 'file' state di CvProvider agar bisa diakses AnalysisView
-
+  
   return (
     <main className="min-h-screen bg-slate-950 text-white relative overflow-hidden flex flex-col">
-       
-       {/* Background Effects */}
+
        <div className="fixed inset-0 pointer-events-none">
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]" />
           <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[120px]" />
        </div>
 
-       {/* Main Content Area */}
        <div className="relative z-10 flex-1 flex flex-col">
           <AnimatePresence mode="wait">
              
@@ -51,11 +48,8 @@ function DashboardContent() {
 
 export default function Page() {
     return (
-        // Provider Membungkus Semuanya
+
         <CvProvider>
-            {/* Trik: Jika Anda malas nambahin 'file' ke context type, 
-                anda bisa gunakan state management sederhana di sini, 
-                tapi context lebih disarankan. */}
             <DashboardContent />
         </CvProvider>
     )

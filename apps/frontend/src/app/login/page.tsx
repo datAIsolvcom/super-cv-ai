@@ -1,14 +1,18 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { useState, Suspense } from "react"; 
+import { useRouter, useSearchParams } from "next/navigation"; 
+import { Loader2, ArrowLeft, Chrome } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function LoginPage() {
+
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams(); 
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -20,17 +24,23 @@ export default function LoginPage() {
     setIsLoading(true);
 
     if (isLogin) {
-      // LOGIN
-      const res = await signIn("credentials", { redirect: false, email, password });
+   
+      const res = await signIn("credentials", { 
+        redirect: false, 
+        email, 
+        password 
+      });
+      
       if (res?.error) {
         alert("Invalid Email or Password");
         setIsLoading(false);
       } else {
-        router.push("/");
+    
+        router.push(callbackUrl);
         router.refresh();
       }
     } else {
-      // REGISTER
+
       try {
         const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
         const res = await fetch(`${backendUrl}/auth/register`, {
@@ -41,14 +51,23 @@ export default function LoginPage() {
 
         if (!res.ok) throw new Error(await res.text());
 
-        // Auto-login after success
+       
         await signIn("credentials", { redirect: false, email, password });
-        router.push("/");
+        
+        
+        router.push(callbackUrl);
+        router.refresh();
+
       } catch (error: any) {
         alert("Registration Failed: " + error.message);
         setIsLoading(false);
       }
     }
+  };
+
+  const handleGoogleLogin = () => {
+      setIsLoading(true);
+      signIn("google", { callbackUrl: callbackUrl });
   };
 
   return (
@@ -59,7 +78,7 @@ export default function LoginPage() {
         <Link href="/" className="inline-flex items-center text-slate-500 hover:text-amber-400 mb-6 text-sm transition-colors"><ArrowLeft size={16} className="mr-1"/> Back to Home</Link>
         
         <h1 className="text-2xl font-serif font-bold text-white mb-2 text-center">{isLogin ? "Welcome Back" : "Join Super CV"}</h1>
-        <p className="text-slate-400 text-sm text-center mb-8">{isLogin ? "Sign in to access your dashboard." : "Create an account to start analyzing."}</p>
+        <p className="text-slate-400 text-sm text-center mb-8">{isLogin ? "Sign in to continue." : "Create an account to start analyzing."}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
@@ -79,8 +98,8 @@ export default function LoginPage() {
           <div className="h-px bg-white/10 flex-1" />
         </div>
 
-        <button onClick={() => signIn("google", { callbackUrl: "/" })} className="w-full h-12 bg-white text-slate-900 font-medium rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
-          Google
+        <button onClick={handleGoogleLogin} className="w-full h-12 bg-white text-slate-900 font-medium rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
+          <Chrome size={20} className="text-slate-900"/> Google
         </button>
 
         <p className="mt-6 text-center text-sm text-slate-400">
@@ -90,5 +109,14 @@ export default function LoginPage() {
         </p>
       </motion.div>
     </div>
+  );
+}
+
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-amber-500"><Loader2 className="animate-spin" size={32}/></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

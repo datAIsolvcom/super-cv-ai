@@ -14,7 +14,7 @@ export function CvEditor() {
 
   const contact = cvData.contact_info || {};
 
-  // --- HANDLERS ---
+
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     const newOrder = Array.from(sectionOrder);
@@ -37,24 +37,24 @@ export function CvEditor() {
       updateCvField(section, [templates[section], ...(cvData as any)[section] || []]);
   };
 
-  // --- RENDER SECTION ---
+ 
   const renderSection = (type: SectionType) => {
     const uiOnly = "print:hidden";
-    // Class untuk mencegah item terpotong tengah-tengah
+
     const preventBreak = "print:break-inside-avoid"; 
-    // Class untuk mencegah Header pisah dari konten
+
     const keepWithNext = "print:break-after-avoid";
 
     switch (type) {
       case "summary":
         return cvData.professional_summary ? (
-          // FIX 1: Gunakan preventBreak di wrapper agar summary tidak terpotong sebagian
+          
           <div className={`group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent ${preventBreak}`}>
              <SectionHeader title="Professional Summary" design={design} className={keepWithNext} />
              <div className="text-justify">
                  <EditableField 
                     tagName="p" 
-                    className={`text-slate-800 ${design.lineHeight}`} // Hapus text-sm agar inherit
+                    className={`text-slate-800 ${design.lineHeight}`} 
                     value={cvData.professional_summary} 
                     onSave={(val) => updateCvField('professional_summary', val)}
                  />
@@ -64,7 +64,7 @@ export function CvEditor() {
 
       case "skills":
         return (cvData.hard_skills || []).length > 0 ? (
-          // FIX 2: Skills pendek, jadi preventBreak satu blok utuh
+       
           <div className={`group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent ${preventBreak}`}>
              <SectionHeader title="Technical Skills" design={design} className={keepWithNext} />
              <div className="flex flex-wrap gap-2 justify-start">
@@ -81,9 +81,9 @@ export function CvEditor() {
 
       case "experience":
         return (cvData.work_experience || []).length > 0 ? (
-           // Wrapper Experience JANGAN preventBreak (karena bisa panjang > 1 halaman), tapi item di dalamnya yang preventBreak
+
            <div className="group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent">
-              {/* FIX 3: Tambahkan class keepWithNext di header div */}
+              
               <div className={`flex justify-between items-center mb-2 border-b pb-1 ${keepWithNext}`} style={{ borderColor: design.accentColor }}>
                   <h2 className="text-[0.9em] font-bold uppercase tracking-widest" style={{ color: design.accentColor }}>Work Experience</h2>
                   <button onClick={() => addItem('work_experience')} className={`opacity-0 group-hover:opacity-100 text-blue-500 hover:bg-blue-100 rounded p-1 ${uiOnly}`}><Plus size={16}/></button>
@@ -91,7 +91,7 @@ export function CvEditor() {
               
               <div className={cn("flex flex-col", design.sectionSpacing)}> 
                  {(cvData.work_experience || []).map((exp, i) => (
-                    // Item individual tidak boleh terpotong
+                    
                     <div key={i} className={`group/item relative ${preventBreak}`}>
                        <button onClick={() => removeItem('work_experience', i)} className={`absolute -right-6 top-0 opacity-0 group-hover/item:opacity-100 text-red-400 p-1 hover:bg-red-50 rounded transition-all ${uiOnly}`}><Trash2 size={14}/></button>
                        <div className="flex justify-between items-baseline">
@@ -126,7 +126,7 @@ export function CvEditor() {
            </div>
         ) : null;
 
-      // Pass class helper ke fungsi render lain
+  
       case "projects": return renderProjects(cvData, design, updateCvField, addItem, removeItem, uiOnly, preventBreak, keepWithNext);
       case "education": return renderEducation(cvData, design, updateCvField, addItem, removeItem, uiOnly, preventBreak, keepWithNext);
       default: return null;

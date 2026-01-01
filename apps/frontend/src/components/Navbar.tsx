@@ -11,7 +11,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu when clicking outside
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -26,7 +26,7 @@ export function Navbar() {
     <nav className="fixed top-0 inset-x-0 z-50 h-20 px-6 flex items-center justify-center pointer-events-none">
       <div className="w-full max-w-7xl flex items-center justify-between pointer-events-auto">
         
-        {/* LOGO */}
+       
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 transition-all">
             <span className="font-serif font-bold text-slate-950 text-xl">S</span>
@@ -36,15 +36,15 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* RIGHT SIDE ACTIONS */}
+      
         <div className="flex items-center gap-6">
           
-          {/* 1. LOADING STATE */}
+         
           {status === "loading" ? (
             <div className="w-10 h-10 rounded-full bg-white/5 animate-pulse" />
           ) : session ? (
             
-            // 2. LOGGED IN USER
+           
             <div className="flex items-center gap-4" ref={menuRef}>
               <div className="hidden md:block text-right">
                 <p className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Welcome Back</p>
@@ -70,7 +70,7 @@ export function Navbar() {
                   </div>
                 </button>
 
-                {/* DROPDOWN MENU */}
+               
                 {isMenuOpen && (
                   <div className="absolute right-0 top-14 w-56 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     <div className="p-4 border-b border-white/5 bg-white/5">
@@ -94,7 +94,7 @@ export function Navbar() {
 
           ) : (
             
-            // 3. GUEST (Link to /login Page)
+           
             <Link 
               href="/login"
               className="px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-sm font-bold text-white transition-all backdrop-blur-md shadow-lg hover:shadow-white/5"

@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  // 1. SYNC (For Google Login)
   async syncUser(userDto: any) {
     const { email, name, picture } = userDto;
     let user = await this.prisma.user.findUnique({ where: { email } });
@@ -18,7 +17,7 @@ export class AuthService {
     return user;
   }
 
-  // 2. REGISTER (New Feature)
+
   async register(body: any) {
     const { email, password, name } = body;
     const existing = await this.prisma.user.findUnique({ where: { email } });
@@ -37,7 +36,6 @@ export class AuthService {
     return user;
   }
 
-  // 3. LOGIN (New Feature)
   async validateUser(body: any) {
     const { email, password } = body;
     const user = await this.prisma.user.findUnique({ where: { email } });

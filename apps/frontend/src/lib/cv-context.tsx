@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useRef, RefObject } from "react";
 
-// --- 1. INTERFACES (Data CV Asli) ---
+
 export interface CvContactInfo { email: string; phone: string; location: string; linkedin?: string; portfolio?: string; }
 export interface CvExperience { title: string; company: string; dates: string; achievements: string[]; location?: string; }
 export interface CvEducation { institution: string; degree: string; year: string; location?: string; }
@@ -20,9 +20,7 @@ export interface CvData {
   certifications?: string[];
 }
 
-// --- 2. INTERFACES (Hasil Analisis AI) ---
 
-// Definisi Critical Gap (Sesuai Python Schema)
 export interface CriticalGap {
   gap: string;
   action: string; 
@@ -32,30 +30,21 @@ export interface AnalysisData {
   candidate_name: string;
   overall_score: number;
   overall_summary: string;
-  
   writing_score: number;
-  writing_detail: string;
-  
+  writing_detail: string; 
   ats_score: number;
   ats_detail: string;
-  
   skill_score: number;
   skill_detail: string;
-  
   experience_score: number;
   experience_detail: string;
-  
   keyword_score: number;
   key_strengths: string[];
-  
-  // Update: Wajib Array of Objects
   critical_gaps: CriticalGap[];
-  
-  // Opsional: Karena backend Python mungkin tidak mengirim ini lagi
   missing_skills?: string[]; 
 }
 
-// --- 3. SETTINGS & TYPES LAIN ---
+
 export interface DesignSettings {
     fontFamily: 'font-sans' | 'font-serif' | 'font-mono';
     fontSize: string;
@@ -133,7 +122,7 @@ export function CvProvider({ children }: { children: ReactNode }) {
   
   const printRef = useRef<HTMLDivElement>(null);
 
-  // Helper: Apply Suggestion dari AI ke CV Data
+  
   const applySuggestion = (section: keyof CvData, content: any, index?: number) => {
       if (!cvData) return;
       const newData = JSON.parse(JSON.stringify(cvData)); 
@@ -149,7 +138,7 @@ export function CvProvider({ children }: { children: ReactNode }) {
       setCvData(newData);
   };
 
-  // Helper: Update field manual (misal saat ngetik di editor)
+
   const updateCvField = (path: string, value: any) => {
     if (!cvData) return;
     const newData = JSON.parse(JSON.stringify(cvData)); 

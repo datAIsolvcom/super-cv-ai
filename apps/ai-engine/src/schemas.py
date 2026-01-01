@@ -1,38 +1,27 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-# --- SCHEMA HASIL ANALISIS (Update sesuai Prompt Rekan Anda) ---
 class CriticalGap(BaseModel):
     gap: str = Field(..., description="The specific missing skill or weakness (e.g., 'Docker', 'Leadership')")
     action: str = Field(..., description="A concrete, actionable recommendation on what the candidate should do (e.g., 'Build a containerized app', 'Lead a small team project')")
 
-# --- 2. UPDATE ANALYSIS SCHEMA ---
 class AnalysisResponse(BaseModel):
     candidate_name: str = Field(..., description="Full name of the candidate")
     overall_score: int = Field(..., description="Overall score 1-100")
     overall_summary: str = Field(..., description="Detailed feedback summary")
-    
-    # Detailed Scoring
     ats_score: int = Field(..., description="ATS compatibility score 0-100")
     ats_detail: str = Field(..., description="Feedback on formatting and structure")
-    
     writing_score: int = Field(..., description="Writing style score 0-100")
     writing_detail: str = Field(..., description="Feedback on grammar and voice")
-    
     skill_score: int = Field(..., description="Skill match score 0-100")
     skill_detail: str = Field(..., description="Feedback on hard/soft skills")
-    
     experience_score: int = Field(..., description="Experience relevance score 0-100")
     experience_detail: str = Field(..., description="Feedback on seniority and projects")
-    
-    # Section 6: Keyword & Gaps (UPDATED)
     keyword_score: int = Field(..., description="Keyword relevance score 0-100")
     key_strengths: List[str] = Field(..., description="List of primary selling points")
-    
-    # GANTI 'missing_skills' MENJADI 'critical_gaps'
     critical_gaps: List[CriticalGap] = Field(..., description="List of critical gaps with specific actionable advice")
 
-# --- SCHEMA CUSTOMIZE (Tetap Sama) ---
+
 class CVContactInfo(BaseModel):
     email: str
     phone: str

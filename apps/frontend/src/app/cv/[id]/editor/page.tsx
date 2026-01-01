@@ -5,8 +5,7 @@ import { useCvPolling } from "@/hooks/useCvPolling";
 import { useCv } from "@/lib/cv-context";
 import { Loader2 } from "lucide-react";
 import { EditorLayout } from "@/components/core/EditorLayout";
-// Import komponen Editor Anda yang sebenarnya (misal: ResumeEditor)
-// import { ResumeEditor } from "@/components/editor/ResumeEditor"; 
+
 
 export default function EditorPage() {
   const params = useParams();
@@ -14,8 +13,7 @@ export default function EditorPage() {
   const { pollingStatus } = useCvPolling(cvId);
   const { aiDraft, cvData } = useCv();
 
-  // Jika sedang rewrite (customize), status mungkin kembali ke PROCESSING
-  // Tapi jika kita sudah punya data aiDraft, kita bisa tampilkan saja
+  
   const isReady = pollingStatus === 'COMPLETED' && (aiDraft || cvData);
 
   if (!isReady && pollingStatus !== 'COMPLETED') {
@@ -29,12 +27,8 @@ export default function EditorPage() {
   }
 
   return (
-    <div className="h-screen bg-slate-900 text-white">
-        {/* Ganti ini dengan Komponen Editor Utama Anda */}
-   
-           
+    <div className="h-screen bg-slate-900 text-white">  
             <EditorLayout />
-    
     </div>
   );
 }

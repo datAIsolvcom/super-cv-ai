@@ -2,7 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AiIntegrationService } from './ai-integration.service'; // Import Service tadi
+import { AiIntegrationService } from './ai-integration.service'; 
 import { CvStatus } from '@prisma/client';
 import * as fs from 'fs';
 
@@ -12,7 +12,7 @@ export class CvProcessor extends WorkerHost {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly aiService: AiIntegrationService, // INJECT DISINI
+    private readonly aiService: AiIntegrationService, 
   ) {
     super();
   }
@@ -35,26 +35,22 @@ export class CvProcessor extends WorkerHost {
     }
   }
 
-  // --- HANDLER 1: ANALYZE ---
+
   private async handleAnalyze(job: Job) {
     const { cvId, filePath, jobContext } = job.data;
 
     try {
-      // 1. Update Status
+      
       await this.prisma.cV.update({ where: { id: cvId }, data: { status: CvStatus.PROCESSING } });
 
-      // 2. Baca File Buffer
       if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
       const fileBuffer = fs.readFileSync(filePath);
-
-      // 3. Panggil AI Service
       const result = await this.aiService.analyzeCv(
         fileBuffer, 
-        'resume.pdf', // Nama file dummy atau ambil dari DB jika ada
+        'resume.pdf', 
         jobContext
       );
 
-      // 4. Update DB
       await this.prisma.cV.update({
         where: { id: cvId },
         data: {
@@ -70,7 +66,7 @@ export class CvProcessor extends WorkerHost {
     }
   }
 
-  // --- HANDLER 2: CUSTOMIZE ---
+
   private async handleCustomize(job: Job) {
     const { cvId, mode, filePath, contextData } = job.data;
 
@@ -79,8 +75,6 @@ export class CvProcessor extends WorkerHost {
 
       if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
       const fileBuffer = fs.readFileSync(filePath);
-
-      // Panggil AI Service
       const aiDraft = await this.aiService.customizeCv(
         fileBuffer,
         'resume.pdf',

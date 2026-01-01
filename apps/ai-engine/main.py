@@ -4,8 +4,7 @@ from fastapi.concurrency import run_in_threadpool
 from typing import Optional, Dict, Any
 import json
 
-# --- IMPORT MODULES ---
-# UPDATE: Ganti AnalysisResult menjadi AnalysisResponse (sesuai schema baru)
+
 from src.schemas import AnalysisResponse, ImprovedCVResult
 from src.services.extractor import extract_text_from_bytes
 from src.services.ai_engine import analyze_cv, customize_cv 
@@ -21,16 +20,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ==============================================================================
-# 1. ENDPOINT ANALYZE (UPDATED)
-# ==============================================================================
 @app.post("/api/analyze")
 async def analyze_endpoint(
     file: UploadFile = File(...),
     job_description: Optional[str] = Form(None),
     job_url: Optional[str] = Form(None)
 ):
-    # 1. Siapkan Konteks Job Description
+  
     final_jd = ""
     if job_description and job_description.strip():
         final_jd = job_description
@@ -45,7 +41,7 @@ async def analyze_endpoint(
     if not final_jd:
         final_jd = "General Tech Professional requirements (Assess based on standard industry best practices)."
 
-    # 2. Baca File CV (CPU Bound -> Pakai threadpool)
+    
     content = await file.read()
     try:
         cv_text = await run_in_threadpool(
@@ -59,10 +55,9 @@ async def analyze_endpoint(
     if len(cv_text) < 50:
         raise HTTPException(status_code=400, detail="CV terlalu pendek atau kosong.")
 
-    # 3. Panggil AI Analysis (Async I/O -> Langsung await)
+   
     try:
-        # UPDATE: Langsung await fungsi async, tidak perlu run_in_threadpool
-        # Return tipe Dictionary (dari model_dump)
+       
         result = await analyze_cv(cv_text, final_jd)
         
         if not result:
@@ -74,9 +69,7 @@ async def analyze_endpoint(
         print(f"AI Error: {e}")
         raise HTTPException(status_code=500, detail=f"AI Engine Error: {str(e)}")
 
-# ==============================================================================
-# 2. ENDPOINT CUSTOMIZE
-# ==============================================================================
+
 @app.post("/api/customize", response_model=ImprovedCVResult)
 async def customize_endpoint(
     file: UploadFile = File(...),
@@ -99,7 +92,7 @@ async def customize_endpoint(
     else:
         raise HTTPException(400, "Mode tidak valid.")
 
-    # 1. Extract Text
+  
     content = await file.read()
     try:
         cv_text = await run_in_threadpool(
@@ -110,9 +103,9 @@ async def customize_endpoint(
     except Exception as e:
         raise HTTPException(400, f"Gagal membaca file: {str(e)}")
 
-    # 2. Generate Improved CV
+    
     try:
-        # UPDATE: Langsung await
+        
         result = await customize_cv(cv_text, mode, final_context)
         return result
     except Exception as e:

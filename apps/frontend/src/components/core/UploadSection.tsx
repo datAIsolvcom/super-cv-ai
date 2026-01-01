@@ -5,7 +5,7 @@ import { useCv } from "@/lib/cv-context";
 import { UploadCloud, FileText, Link as LinkIcon, Sparkles, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation"; 
-import { useSession } from "next-auth/react"; // [BARU] Import Session Hook
+import { useSession } from "next-auth/react"; 
 
 export function UploadSection() {
   const { setFile, file, setIsLoading, isLoading } = useCv();
@@ -13,17 +13,10 @@ export function UploadSection() {
   const [jobContext, setJobContext] = useState(""); 
   
   const router = useRouter();
-  
-  // [BARU] Ambil data session user (untuk mendapatkan UUID)
+ 
   const { data: session } = useSession(); 
 
   const handleAnalyze = async () => {
-    // [BARU] Cek apakah user sudah login
-    if (!session || !session.user?.id) {
-        alert("Silakan login terlebih dahulu untuk memulai analisis.");
-        router.push("/login"); // Redirect ke halaman login
-        return;
-    }
 
     if (!file) return alert("Please upload a CV PDF first.");
 
@@ -31,7 +24,6 @@ export function UploadSection() {
     const formData = new FormData();
     formData.append("file", file);
     
-    // Sesuaikan field name dengan DTO di NestJS (AnalyzeCvDto)
     if (activeTab === "text") {
         formData.append("jobDescriptionText", jobContext);
     }
@@ -40,28 +32,22 @@ export function UploadSection() {
     }
 
     try {
-      // Panggil Backend NestJS
       const res = await fetch("http://localhost:3001/cv/analyze", { 
         method: "POST", 
         body: formData,
         headers: {
-            // [BARU] Kirim UUID User yang valid dari Session
-            'userId': session.user.id 
+            
+            ...(session?.user?.id ? { 'userId': session.user.id } : {})
         }
       });
       
       if (!res.ok) {
-          // Handle error spesifik (misal token expired)
-          if (res.status === 401) {
-              throw new Error("Sesi tidak valid. Silakan login ulang.");
-          }
           const errData = await res.json();
           throw new Error(errData.message || "Upload failed");
       }
       
-      const data = await res.json(); // Backend return: { cvId: "...", status: "PENDING" }
+      const data = await res.json(); 
       
-      // Redirect ke halaman Polling (Dynamic Route)
       router.push(`/cv/${data.cvId}/analyze`);
       
     } catch (e: any) {
@@ -80,7 +66,7 @@ export function UploadSection() {
          <p className="text-slate-400 text-lg">Upload your resume and get a ruthless 6-point analysis.</p>
       </div>
 
-      {/* TABS */}
+
       <div className="flex gap-2 bg-slate-950/50 p-1.5 rounded-xl mb-8 border border-white/5">
          {['general', 'text', 'link'].map((t) => (
             <button key={t} onClick={() => setActiveTab(t as any)} 
@@ -94,7 +80,7 @@ export function UploadSection() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 h-[320px]">
-        {/* LEFT: DRAG & DROP AREA */}
+  
         <div className="relative border-2 border-dashed border-slate-700 hover:border-amber-500/50 hover:bg-slate-800/20 rounded-2xl flex flex-col items-center justify-center transition-all group overflow-hidden h-full">
            <input type="file" accept=".pdf,.docx" onChange={(e) => setFile(e.target.files?.[0] || null)} className="absolute inset-0 opacity-0 cursor-pointer z-20"/>
            
@@ -117,7 +103,6 @@ export function UploadSection() {
            )}
         </div>
 
-        {/* RIGHT: CONTEXT INPUT & BUTTON */}
         <div className="flex flex-col h-full gap-4">
            <div className="flex-1 bg-slate-950/30 rounded-2xl p-4 border border-white/5 relative">
               {activeTab === 'general' ? (
