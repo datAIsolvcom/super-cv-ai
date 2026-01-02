@@ -23,11 +23,9 @@ export class CvService {
   ) {
     if (!file) throw new BadRequestException('File is required');
 
-
     if (userId) {
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!user) throw new UnauthorizedException('User account not found.');
-      
       
       if (user.credits <= 0) {
            throw new BadRequestException('Insufficient credits. Please upgrade your plan.');
@@ -39,7 +37,6 @@ export class CvService {
       });
     }
 
-    
     const uploadDir = path.join(process.cwd(), 'uploads');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
@@ -49,7 +46,6 @@ export class CvService {
     const filePath = path.join(uploadDir, uniqueFilename);
     fs.writeFileSync(filePath, file.buffer);
 
-  
     const cv = await this.prisma.cV.create({
       data: {
         userId: userId || null,
@@ -62,6 +58,9 @@ export class CvService {
       },
     });
 
+
+    const today = new Date().toISOString().split('T')[0];
+
     await this.cvQueue.add(
       'analyze-job', 
       {
@@ -71,6 +70,8 @@ export class CvService {
           text: dto.jobDescriptionText,
           url: dto.jobDescriptionUrl,
         },
+      
+        currentDate: today, 
       },
       {
         attempts: 3,
@@ -78,13 +79,12 @@ export class CvService {
       },
     );
 
-    this.logger.log(`CV ${cv.id} queued for Analysis (User: ${userId || 'Guest'}).`);
+    this.logger.log(`CV ${cv.id} queued for Analysis (Date: ${today}).`);
 
     return { cvId: cv.id, status: 'PENDING' };
   }
 
   async claimCv(cvId: string, userId: string) {
-  
     const cv = await this.prisma.cV.findUnique({ where: { id: cvId } });
     if (!cv) throw new NotFoundException('CV not found');
 
@@ -92,7 +92,6 @@ export class CvService {
         throw new BadRequestException('This CV belongs to another user.');
     }
 
-    
     if (cv.userId === userId) {
         return { status: 'ALREADY_OWNED', message: 'CV already unlocked.' };
     }
@@ -137,13 +136,17 @@ export class CvService {
         contextData = cv.jobContext; 
     }
 
+    
+    const today = new Date().toISOString().split('T')[0];
+
     await this.cvQueue.add(
       'customize-job', 
       {
         cvId: cv.id,
         mode: mode,
         filePath: cv.fileUrl,
-        contextData: contextData
+        contextData: contextData,
+        currentDate: today,
       },
       {
         attempts: 3,

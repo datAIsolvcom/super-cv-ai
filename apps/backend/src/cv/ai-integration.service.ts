@@ -17,12 +17,11 @@ export class AiIntegrationService {
   }
 
 
-  async analyzeCv(fileBuffer: Buffer, filename: string, jobContext: any) {
+  async analyzeCv(fileBuffer: Buffer, filename: string, jobContext: any, currentDate?: string) {
     try {
       const formData = new FormData();
       formData.append('file', fileBuffer, { filename });
 
-    
       if (typeof jobContext === 'string') {
           formData.append('job_description', jobContext);
       } else if (jobContext?.text) {
@@ -31,7 +30,12 @@ export class AiIntegrationService {
           formData.append('job_url', jobContext.url);
       }
 
-      this.logger.log(`[AI] Sending Analyze Request to ${this.aiEngineUrl}`);
+    
+      if (currentDate) {
+        formData.append('current_date', currentDate);
+      }
+
+      this.logger.log(`[AI] Sending Analyze Request to ${this.aiEngineUrl} (Date Context: ${currentDate})`);
 
       const { data } = await firstValueFrom(
         this.httpService.post(`${this.aiEngineUrl}/api/analyze`, formData, {
@@ -47,24 +51,26 @@ export class AiIntegrationService {
   }
 
 
-  async customizeCv(fileBuffer: Buffer, filename: string, mode: string, contextData: any) {
+  async customizeCv(fileBuffer: Buffer, filename: string, mode: string, contextData: any, currentDate?: string) {
     try {
       const formData = new FormData();
       formData.append('file', fileBuffer, { filename });
       formData.append('mode', mode);
 
-      
       if (mode === 'analysis') {
-        
         const contextStr = typeof contextData === 'string' ? contextData : JSON.stringify(contextData);
         formData.append('analysis_context', contextStr);
       } else {
-       
         const jobStr = typeof contextData === 'string' ? contextData : (contextData?.text || '');
         formData.append('job_description', jobStr);
       }
 
-      this.logger.log(`[AI] Sending Customize Request (Mode: ${mode})`);
+     
+      if (currentDate) {
+        formData.append('current_date', currentDate);
+      }
+
+      this.logger.log(`[AI] Sending Customize Request (Mode: ${mode}, Date Context: ${currentDate})`);
 
       const { data } = await firstValueFrom(
         this.httpService.post(`${this.aiEngineUrl}/api/customize`, formData, {

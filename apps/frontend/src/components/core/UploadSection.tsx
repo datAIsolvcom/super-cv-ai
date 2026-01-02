@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation"; 
 import { useSession } from "next-auth/react"; 
 import { cn } from "@/lib/utils";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 export function UploadSection() {
   const { setFile, file, setIsLoading, isLoading } = useCv();
@@ -14,6 +15,7 @@ export function UploadSection() {
   const [jobContext, setJobContext] = useState(""); 
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   
   const router = useRouter();
   const { data: session } = useSession(); 
@@ -54,32 +56,36 @@ export function UploadSection() {
         headers: { ...(session?.user?.id ? { 'userId': session.user.id } : {}) }
       });
       
+      const data = await res.json(); 
+
       if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.message || "Upload failed");
+          
+          if (res.status === 400 || res.status === 403) {
+            setShowUpgradeModal(true); 
+          }
+          
+          throw new Error(data.message || "Upload failed");
       }
       
-      const data = await res.json(); 
       router.push(`/cv/${data.cvId}/analyze`);
       
     } catch (e: any) {
-      console.error(e);
-      alert(`Error: ${e.message}`);
+      console.error("Analysis Error:", e.message);
       setIsLoading(false); 
     }
   };
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-    
+      <UpgradeModal 
+        isOpen={showUpgradeModal} 
+        onClose={() => setShowUpgradeModal(false)} 
+      />
+
       <div className="glass-panel rounded-[32px] p-2 md:p-3 relative overflow-hidden group">
-        
-       
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]"/>
 
         <div className="bg-slate-950/80 rounded-[24px] p-6 md:p-10 border border-white/5 relative z-10">
-          
-         
           <div className="flex justify-center mb-8">
             <div className="inline-flex bg-slate-900/80 p-1.5 rounded-full border border-white/10 shadow-inner">
                {[
@@ -105,8 +111,6 @@ export function UploadSection() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 h-auto md:h-[340px]">
-            
-          
             <div 
               onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
@@ -155,7 +159,6 @@ export function UploadSection() {
                </AnimatePresence>
             </div>
 
-          
             <div className="flex flex-col gap-4">
                <div className="flex-1 bg-slate-900/50 border border-white/5 rounded-2xl p-1 relative overflow-hidden group/input focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/50 transition-all">
                   {activeTab === 'general' ? (
@@ -184,11 +187,9 @@ export function UploadSection() {
                     {isLoading ? <Loader2 className="animate-spin"/> : <Sparkles size={20} className="text-indigo-600"/>}
                     {isLoading ? "Analyzing..." : "Initialize Analysis"}
                   </span>
-                  
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/80 to-transparent -translate-x-[100%] group-hover/btn:translate-x-[100%] transition-transform duration-700"/>
                </button>
             </div>
-
           </div>
         </div>
       </div>

@@ -11,8 +11,6 @@ import { toast } from "sonner";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams(); 
-  
-  // Ambil URL tujuan (default ke home "/")
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const [isLoading, setIsLoading] = useState(false);
@@ -44,16 +42,14 @@ function LoginForm() {
     }
   };
 
-  // [PERBAIKAN UTAMA ADA DISINI]
+ 
   const handleGoogleLogin = () => {
       setIsLoading(true);
       toast.loading("Redirecting to Google...");
       
-      // Cek apakah callbackUrl sudah punya query param (?)
-      // Jika sudah ada (misal /dashboard?tab=1), pakai '&'. Jika belum, pakai '?'.
+      
       const separator = callbackUrl.includes('?') ? '&' : '?';
       
-      // Tambahkan penanda 'login=success' ke URL tujuan
       const finalCallbackUrl = `${callbackUrl}${separator}login=success`;
 
       signIn("google", { callbackUrl: finalCallbackUrl });

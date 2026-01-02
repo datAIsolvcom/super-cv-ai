@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime # [UPDATE] Tambah import ini
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -8,7 +9,6 @@ from src.schemas import AnalysisResponse, ImprovedCVResult, CVContactInfo
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 MODEL_NAME = "gemini-3-flash-preview" 
-
 def clean_json_text(text: str) -> str:
     try:
         if "```json" in text:
@@ -20,6 +20,7 @@ def clean_json_text(text: str) -> str:
         return text
 
 async def extract_data_only(cv_text: str) -> ImprovedCVResult:
+    
     prompt_text = f"""
     You are a strict data parser. 
     Extract the following CV text into a structured JSON format matching this schema.
@@ -43,23 +44,33 @@ async def extract_data_only(cv_text: str) -> ImprovedCVResult:
         return ImprovedCVResult(**json.loads(clean_json_text(response.text)))
     except Exception as e:
         print(f"Extract Error: {e}")
-       
         return ImprovedCVResult(
             full_name="Candidate", professional_summary="", 
             contact_info=CVContactInfo(email="", phone="", location=""), 
             hard_skills=[], soft_skills=[], work_experience=[], education=[], projects=[]
         )
 
-async def analyze_cv(cv_text: str, job_desc: str):
+
+async def analyze_cv(cv_text: str, job_desc: str, current_date: str = None):
     
+  
+    if not current_date:
+        current_date = datetime.now().strftime("%Y-%m-%d")
+
     final_job_desc = job_desc
     if not job_desc or job_desc.strip() == "" or job_desc.lower() == "undefined":
         final_job_desc = "General Professional Standards for the candidate's role. Focus on impact, clarity, ATS best practices, and seniority level."
 
-    
+   
     prompt_text = f"""
     You are a Senior Technical Recruiter and CV Expert. 
     Analyze the following Candidate CV against the provided Job Description. Use "You" to address the candidate directly.
+
+    *** TIME CONTEXT (CRITICAL) ***:
+    - Today's Date is: **{current_date}**.
+    - Any experience listed with a year equal to or before the current year ({current_date.split('-')[0]}) is VALID.
+    - DO NOT flag "{current_date.split('-')[0]}" (Current Year) as a "future date error".
+    - "Present" or "Current" means valid up to today.
 
     JOB DESCRIPTION:
     {final_job_desc}
@@ -76,26 +87,22 @@ async def analyze_cv(cv_text: str, job_desc: str):
     
     2. **Writing Style (Score 0-100)**: 
        - Check for clarity, grammar, and typos.
-       - Identify weak phrasing (excessive passive voice) vs action-oriented language.
     
     3. **CV Format & ATS (Score 0-100)**: 
-       - Is the format ATS-friendly? (Clean structure, standard fonts).
-       - Is it machine-readable?
+       - Is the format ATS-friendly?
     
     4. **Skill Match (Score 0-100)**: 
        - How well do the hard skills and soft skills match the Job Description?
-       - If Job Description is General, score based on industry standards for the role implied in the CV.
     
     5. **Experience & Projects (Score 0-100)**: 
        - Evaluate if work history/projects are relevant.
-       - Does the experience level (Seniority) match?
+       - CHECK DATES CAREFULLY: Do not incorrectly mark valid recent dates as future errors based on the 'Today's Date' provided above.
 
     6. **Keyword Relevance & Critical Gaps (Score 0-100)**:
        - List primary selling points (key_strengths).
        - Identify critical gaps.
        - **CRITICAL INSTRUCTION**: For EACH gap identified, provide a specific "action". 
          Example: Gap="Docker", Action="Build a simple microservice using Docker."
-         The action must be concrete.
 
     *** REQUIRED JSON OUTPUT FORMAT ***
     You MUST output strictly JSON matching the AnalysisResponse schema.
@@ -119,15 +126,12 @@ async def analyze_cv(cv_text: str, job_desc: str):
             
     except Exception as e:
         print(f"Analyze Error: {e}")
-        
         analysis_res = AnalysisResponse(
             candidate_name="Unknown", overall_score=0, overall_summary=f"Error: {str(e)}",
             writing_score=0, writing_detail="", ats_score=0, ats_detail="",
             skill_score=0, skill_detail="", experience_score=0, experience_detail="",
-            keyword_score=0, key_strengths=[], 
-            critical_gaps=[] # <--- UPDATED
+            keyword_score=0, key_strengths=[], critical_gaps=[]
         )
-
 
     original_data = await extract_data_only(cv_text)
 
@@ -136,8 +140,11 @@ async def analyze_cv(cv_text: str, job_desc: str):
         "cv_data": original_data.model_dump()
     }
 
-async def customize_cv(cv_text: str, mode: str, context_data: str) -> ImprovedCVResult:
-   
+async def customize_cv(cv_text: str, mode: str, context_data: str, current_date: str = None):
+    
+    if not current_date:
+        current_date = datetime.now().strftime("%Y-%m-%d")
+
     if mode == 'job_desc':
         mode_context = f"TARGET JOB DESCRIPTION: {context_data}"
         goal = "Tailor the CV keywords to match the Target Job, but PRESERVE the candidate's history."
@@ -148,31 +155,25 @@ async def customize_cv(cv_text: str, mode: str, context_data: str) -> ImprovedCV
     prompt_text = f"""
     You are an Expert Resume Writer. Your task is to REWRITE the candidate's CV to be world-class, ATS-friendly, and high-impact.
     
+    CONTEXT:
+    - Today's Date: {current_date}
+    - {mode_context}
+    
+    GOAL: {goal}
+
     ORIGINAL CV CONTENT:
     {cv_text}
     
-    CONTEXT:
-    {mode_context}
-    GOAL: {goal}
+    *** CRITICAL RULES ***:
+    1. **NO DELETION**: Preserve all work history.
+    2. **NO HALLUCINATIONS**: Do not invent skills.
+    3. **DATE ACCURACY**: Ensure dates are formatted correctly relative to today ({current_date}). 
+       If a job is current, ensure it is clear (e.g., "Jan 2024 - Present").
     
-    *** CRITICAL RULES (MUST FOLLOW) ***:
-    1. **NO DELETION (CRITICAL)**: You must PRESERVE ALL "Work Experience" and "Projects" entries found in the original CV. 
-       - If the original CV has 5 past jobs, the output MUST have 5 past jobs.
-       - DO NOT remove an entry just because it seems "irrelevant". Instead, shorten its bullet points.
-    
-    2. **NO HALLUCINATIONS**: Do NOT add "Hard Skills", "Certifications", or "Work Experiences" that are NOT present in the ORIGINAL CV.
-    
-    3. **NO FABRICATION**: If the Job Description asks for a skill (e.g., "Kubernetes") and the candidate does NOT mention it, DO NOT add it.
-    
-    4. **TRUTH OPTIMIZATION**: You MAY rephrase existing bullet points to use strong action verbs (e.g., changed "Worked on" to "Spearheaded") and highlight keywords found in the Job Description.
-
     *** WRITING INSTRUCTIONS ***:
-    1. **Summary**: Write a punchy, metric-driven summary tailored to the context.
-    2. **Experience**: 
-       - Use the Google XYZ formula: "Accomplished [X] as measured by [Y], by doing [Z]".
-       - Prioritize relevant experiences by giving them more detail.
-       - Keep less relevant experiences concise, but DO NOT DELETE THEM.
-    3. **Skills**: Re-organize skills to prioritize what matches the Job Description.
+    1. Summary: Metric-driven.
+    2. Experience: Google XYZ formula.
+    3. Skills: Re-organize based on priority.
 
     OUTPUT: Strictly JSON matching the ImprovedCVResult schema.
     """
@@ -187,7 +188,6 @@ async def customize_cv(cv_text: str, mode: str, context_data: str) -> ImprovedCV
         return ImprovedCVResult(**json.loads(clean_json_text(response.text)))
     except Exception as e:
         print(f"Customize Error: {e}")
-
         return ImprovedCVResult(
             full_name="Error Generating CV", professional_summary=f"AI Error: {str(e)}",
             contact_info=CVContactInfo(email="", phone="", location=""),

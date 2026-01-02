@@ -3,15 +3,16 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useCv, CriticalGap } from "@/lib/cv-context"; 
-import { useSession, signIn } from "next-auth/react"; 
+import { useSession } from "next-auth/react"; 
 import { 
-  ArrowRight, Sparkles, AlertTriangle, ChevronLeft, Loader2, Info, X, 
-  ChevronRight, Zap, Check, ChevronDown, Lightbulb, Lock, Unlock, Crown, Target
+  ArrowRight, Sparkles, ChevronLeft, Loader2, Info, X, 
+  Zap, Check, ChevronDown, Lock, Unlock, Target
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter"; 
+import { UpgradeModal } from "@/components/UpgradeModal"; 
 
-// --- ANIMASI ---
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -26,7 +27,6 @@ export function AnalysisView() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<{title: string, score: number, detail: string} | null>(null);
 
-  // State Lock & Modal
   const [isUnlocked, setIsUnlocked] = useState(false); 
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false); 
@@ -34,10 +34,8 @@ export function AnalysisView() {
   const params = useParams();
   const router = useRouter();
   const cvId = params.id as string; 
-  
   const { data: session } = useSession();
 
-  
   const handleUnlock = async () => {
      if (!session?.user?.id) {
          const currentUrl = encodeURIComponent(window.location.href);
@@ -52,26 +50,28 @@ export function AnalysisView() {
              headers: { 'userId': session.user.id as string }
          });
 
+         const data = await res.json();
+
          if (!res.ok) {
-             const err = await res.json();
+           
              if (res.status === 400 || res.status === 403) {
                 setShowUpgradeModal(true);
              } else {
-                alert(err.message || "Gagal membuka laporan.");
+                console.error("Unlock error:", data.message);
+               
              }
              setIsUnlocking(false);
              return;
          }
          setIsUnlocked(true);
      } catch (e) {
-         console.error(e);
-         alert("Terjadi kesalahan jaringan.");
+         console.error("Network error:", e);
+        
      } finally {
          setIsUnlocking(false);
      }
   };
 
- 
   const handleCustomize = async (mode: 'analysis' | 'job_desc') => {
     setIsGenerating(true);
     try {
@@ -84,7 +84,8 @@ export function AnalysisView() {
         if (!res.ok) throw new Error("Failed");
         router.push(`/cv/${cvId}/editor`);
     } catch (e) {
-        alert("Gagal memproses permintaan AI.");
+        console.error("AI Customization error:", e);
+        
         setIsGenerating(false);
     }
   };
@@ -102,40 +103,32 @@ export function AnalysisView() {
 
   return (
     <div className="max-w-7xl mx-auto w-full relative pb-20">
-       
-       
-       <AnimatePresence>
-         {showUpgradeModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowUpgradeModal(false)}>
-                <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-slate-900 border border-champagne-500/30 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
-                    <div className="p-8 text-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-champagne-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-champagne-500/20">
-                             <Crown size={40} className="text-white" fill="currentColor"/>
-                        </div>
-                        <h2 className="text-2xl font-bold text-white mb-2">Credits Exhausted</h2>
-                        <p className="text-slate-400 mb-8 leading-relaxed">Upgrade to <span className="text-champagne-400 font-bold">Pro</span> to unlock unlimited AI analysis.</p>
-                        <div className="space-y-3">
-                            <button onClick={() => alert("Fitur Payment Gateway...")} className="w-full py-3.5 bg-gradient-to-r from-champagne-500 to-orange-500 text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg">Upgrade Now ($9/mo)</button>
-                            <button onClick={() => setShowUpgradeModal(false)} className="w-full py-3.5 bg-slate-800 text-slate-300 font-bold rounded-xl hover:bg-slate-700 transition-colors">Maybe Later</button>
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
-         )}
-         {selectedMetric && (
+        
+      
+        <UpgradeModal 
+           isOpen={showUpgradeModal} 
+           onClose={() => setShowUpgradeModal(false)} 
+        />
+
+     
+        <AnimatePresence>
+          {selectedMetric && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setSelectedMetric(null)}>
                 <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                     <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-800/50">
                         <div className="flex items-center gap-3">
-                             <div className={`p-2 rounded-lg bg-white/5 ${getScoreBgColor(selectedMetric.score)}`}><Info size={20}/></div>
-                             <div><h3 className="font-bold text-white text-lg">{selectedMetric.title}</h3><p className="text-xs text-slate-400">Detailed Analysis Breakdown</p></div>
+                             <div className={`p-2 rounded-lg ${getScoreBgColor(selectedMetric.score)}`}><Info size={20}/></div>
+                             <div>
+                                <h3 className="font-bold text-white text-lg">{selectedMetric.title}</h3>
+                                <p className="text-xs text-slate-400">Detailed Analysis Breakdown</p>
+                             </div>
                         </div>
                         <button onClick={() => setSelectedMetric(null)} className="p-2 hover:bg-white/10 rounded-full text-slate-400 transition-colors"><X size={20}/></button>
                     </div>
                     <div className="p-8">
                          <div className="flex items-center justify-between mb-6 bg-slate-950/50 p-4 rounded-xl border border-white/5">
                              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Score Achieved</span>
-                             <div className="flex items-baseline gap-1"><span className={`text-3xl font-black ${getScoreBgColor(selectedMetric.score)}`}>{selectedMetric.score}</span><span className="text-sm text-slate-500 font-medium">/100</span></div>
+                             <div className="flex items-baseline gap-1"><span className={`text-3xl font-black ${getScoreTextColor(selectedMetric.score)}`}>{selectedMetric.score}</span><span className="text-sm text-slate-500 font-medium">/100</span></div>
                          </div>
                          <div className="space-y-2">
                             <h4 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Analysis Insights</h4>
@@ -145,45 +138,40 @@ export function AnalysisView() {
                     </div>
                 </motion.div>
             </div>
-         )}
-       </AnimatePresence>
+          )}
+        </AnimatePresence>
 
-       
-       {!isUnlocked ? (
-        <div className="max-w-4xl mx-auto py-20 px-4 text-center relative min-h-[600px] flex flex-col items-center justify-center">
-        
-            <div className="absolute inset-0 opacity-20 pointer-events-none select-none overflow-hidden blur-sm">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
-                     <div className="bg-slate-800 h-40 rounded-2xl w-full"/>
-                     <div className="bg-slate-800 h-40 rounded-2xl w-full"/>
-                     <div className="bg-slate-800 h-60 rounded-2xl w-full col-span-2"/>
-                 </div>
-            </div>
+        {!isUnlocked ? (
+          <div className="max-w-4xl mx-auto py-20 px-4 text-center relative min-h-[600px] flex flex-col items-center justify-center">
+             <div className="absolute inset-0 opacity-20 pointer-events-none select-none overflow-hidden blur-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                      <div className="bg-slate-800 h-40 rounded-2xl w-full"/>
+                      <div className="bg-slate-800 h-40 rounded-2xl w-full"/>
+                      <div className="bg-slate-800 h-60 rounded-2xl w-full col-span-2"/>
+                  </div>
+             </div>
 
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-slate-900/80 backdrop-blur-2xl p-10 md:p-14 rounded-[40px] shadow-2xl border border-champagne-500/20 max-w-lg w-full relative z-10">
-                 <div className="w-24 h-24 bg-gradient-to-br from-champagne-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-8 text-white shadow-[0_0_40px_rgba(245,158,11,0.4)]">
-                     <Lock size={40} />
-                 </div>
-                 <h2 className="text-4xl font-serif font-bold text-white mb-3">Analysis Complete</h2>
-                 <p className="text-slate-400 mb-10 text-lg">
-                     Your CV scored <span className="text-champagne-400 font-bold text-xl">{analysisResult.overall_score}/100</span>.
-                     <br/> Unlock to reveal the strategy to improve it.
-                 </p>
-                 <button onClick={handleUnlock} disabled={isUnlocking} className="w-full py-5 bg-white text-slate-900 font-bold text-lg rounded-2xl hover:bg-champagne-100 transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 shadow-xl">
-                     {isUnlocking ? <Loader2 className="animate-spin"/> : <Unlock size={24}/>}
-                     {session ? "Unlock Report (1 Credit)" : "Sign In to Unlock"}
-                 </button>
-                 <p className="text-xs text-slate-500 mt-5 font-medium uppercase tracking-wider">{session ? "Instant Access • 1 Credit Deducted" : "Free Plan includes 3 Credits"}</p>
-            </motion.div>
-        </div>
-       ) : (
+             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-slate-900/80 backdrop-blur-2xl p-10 md:p-14 rounded-[40px] shadow-2xl border border-champagne-500/20 max-w-lg w-full relative z-10">
+                  <div className="w-24 h-24 bg-gradient-to-br from-champagne-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-8 text-white shadow-[0_0_40px_rgba(245,158,11,0.4)]">
+                      <Lock size={40} />
+                  </div>
+                  <h2 className="text-4xl font-serif font-bold text-white mb-3">Analysis Complete</h2>
+                  <p className="text-slate-400 mb-10 text-lg">
+                      Your CV scored <span className="text-champagne-400 font-bold text-xl">{analysisResult.overall_score}/100</span>.
+                      <br/> Unlock to reveal the strategy to improve it.
+                  </p>
+                  <button onClick={handleUnlock} disabled={isUnlocking} className="w-full py-5 bg-white text-slate-900 font-bold text-lg rounded-2xl hover:bg-champagne-100 transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 shadow-xl">
+                      {isUnlocking ? <Loader2 className="animate-spin text-orange-600"/> : <Unlock size={24} className="text-orange-600"/>}
+                      {session ? "Unlock Report (1 Credit)" : "Sign In to Unlock"}
+                  </button>
+                  <p className="text-xs text-slate-500 mt-5 font-medium uppercase tracking-wider">{session ? "Instant Access • 1 Credit Deducted" : "Free Plan includes 3 Credits"}</p>
+             </motion.div>
+          </div>
+        ) : (
          
-         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-            
+          <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6 px-4">
             
             <div className="grid lg:grid-cols-3 gap-6">
-                
-                
                 <motion.div variants={itemVariants} className="lg:col-span-2 glass-panel rounded-[32px] p-8 md:p-12 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-champagne-500/10 rounded-full blur-[100px] pointer-events-none"/>
                     
@@ -199,8 +187,9 @@ export function AnalysisView() {
                                 {analysisResult.overall_summary}
                             </p>
                             <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
-                                <button onClick={() => handleCustomize('analysis')} className="px-8 py-3 bg-white text-slate-950 font-bold rounded-xl hover:bg-champagne-100 transition-colors shadow-lg shadow-white/10 flex items-center gap-2">
-                                    <Zap size={18} className="text-orange-600"/> Fix Issues with AI
+                                <button onClick={() => handleCustomize('analysis')} disabled={isGenerating} className="px-8 py-3 bg-white text-slate-950 font-bold rounded-xl hover:bg-champagne-100 transition-colors shadow-lg shadow-white/10 flex items-center gap-2">
+                                    {isGenerating ? <Loader2 size={18} className="animate-spin"/> : <Zap size={18} className="text-orange-600"/>} 
+                                    Fix Issues with AI
                                 </button>
                                 <button onClick={() => router.push('/')} className="px-6 py-3 bg-transparent border border-white/10 text-slate-300 font-bold rounded-xl hover:bg-white/5 transition-colors">
                                     Back Home
@@ -208,13 +197,11 @@ export function AnalysisView() {
                             </div>
                         </div>
 
-                       
                         <div className="relative w-48 h-48 md:w-56 md:h-56 shrink-0">
-                           
                             <svg className="w-full h-full transform -rotate-90">
                                 <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-800" />
                                 <motion.circle 
-                                    initial={{ strokeDasharray: "283 283", strokeDashoffset: 283 }} // 2*PI*r approx
+                                    initial={{ strokeDasharray: "283 283", strokeDashoffset: 283 }} 
                                     animate={{ strokeDashoffset: 283 - (analysisResult.overall_score / 100) * 283 }}
                                     transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
                                     cx="50%" cy="50%" r="45%" 
@@ -237,7 +224,6 @@ export function AnalysisView() {
                     </div>
                 </motion.div>
 
-               
                 <motion.div variants={itemVariants} className="glass-panel rounded-[32px] p-6 flex flex-col h-full min-h-[400px] border-l-4 border-l-champagne-500/50">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="p-2.5 bg-red-500/10 rounded-xl text-red-400"><Target size={20}/></div>
@@ -259,7 +245,6 @@ export function AnalysisView() {
                 </motion.div>
             </div>
 
-          
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {metrics.map((m, i) => (
                     <motion.div variants={itemVariants} key={i}>
@@ -271,8 +256,8 @@ export function AnalysisView() {
                 ))}
             </div>
 
-         </motion.div>
-       )}
+          </motion.div>
+        )}
     </div>
   );
 }

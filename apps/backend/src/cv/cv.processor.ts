@@ -35,20 +35,22 @@ export class CvProcessor extends WorkerHost {
     }
   }
 
-
   private async handleAnalyze(job: Job) {
-    const { cvId, filePath, jobContext } = job.data;
+
+    const { cvId, filePath, jobContext, currentDate } = job.data;
 
     try {
-      
       await this.prisma.cV.update({ where: { id: cvId }, data: { status: CvStatus.PROCESSING } });
 
       if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
       const fileBuffer = fs.readFileSync(filePath);
+      
+  
       const result = await this.aiService.analyzeCv(
         fileBuffer, 
         'resume.pdf', 
-        jobContext
+        jobContext,
+        currentDate 
       );
 
       await this.prisma.cV.update({
@@ -66,20 +68,23 @@ export class CvProcessor extends WorkerHost {
     }
   }
 
-
   private async handleCustomize(job: Job) {
-    const { cvId, mode, filePath, contextData } = job.data;
+    
+    const { cvId, mode, filePath, contextData, currentDate } = job.data;
 
     try {
       await this.prisma.cV.update({ where: { id: cvId }, data: { status: CvStatus.PROCESSING } });
 
       if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
       const fileBuffer = fs.readFileSync(filePath);
+      
+     
       const aiDraft = await this.aiService.customizeCv(
         fileBuffer,
         'resume.pdf',
         mode,
-        contextData
+        contextData,
+        currentDate 
       );
 
       await this.prisma.cV.update({

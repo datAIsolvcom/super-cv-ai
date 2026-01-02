@@ -12,7 +12,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams(); 
   
-  // Ambil callbackUrl asli, default ke "/"
+
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,12 +65,11 @@ function RegisterForm() {
     }
   };
 
-  // [PERBAIKAN SAMA SEPERTI LOGIN]
   const handleGoogleLogin = () => {
       setIsLoading(true);
       toast.loading("Redirecting to Google...");
       
-      // Sisipkan '?login=success' agar AuthToast mendeteksinya nanti
+      
       const separator = callbackUrl.includes('?') ? '&' : '?';
       const finalCallbackUrl = `${callbackUrl}${separator}login=success`;
 

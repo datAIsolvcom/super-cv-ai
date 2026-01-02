@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.concurrency import run_in_threadpool
 from typing import Optional, Dict, Any
 import json
+from datetime import datetime
 
 
 from src.schemas import AnalysisResponse, ImprovedCVResult
@@ -24,7 +25,8 @@ app.add_middleware(
 async def analyze_endpoint(
     file: UploadFile = File(...),
     job_description: Optional[str] = Form(None),
-    job_url: Optional[str] = Form(None)
+    job_url: Optional[str] = Form(None),
+    current_date: Optional[str] = Form(None) 
 ):
   
     final_jd = ""
@@ -57,8 +59,8 @@ async def analyze_endpoint(
 
    
     try:
-       
-        result = await analyze_cv(cv_text, final_jd)
+        
+        result = await analyze_cv(cv_text, final_jd, current_date)
         
         if not result:
             raise HTTPException(status_code=500, detail="AI Analysis returned empty result.")
@@ -75,7 +77,8 @@ async def customize_endpoint(
     file: UploadFile = File(...),
     mode: str = Form(...),
     job_description: Optional[str] = Form(None),
-    analysis_context: Optional[str] = Form(None)
+    analysis_context: Optional[str] = Form(None),
+    current_date: Optional[str] = Form(None)
 ):
     final_context = ""
     
@@ -105,8 +108,7 @@ async def customize_endpoint(
 
     
     try:
-        
-        result = await customize_cv(cv_text, mode, final_context)
+        result = await customize_cv(cv_text, mode, final_context, current_date)
         return result
     except Exception as e:
         print(f"Customize Error: {e}")
