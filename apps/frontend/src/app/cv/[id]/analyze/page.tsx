@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useCvQuery } from "@/features/analysis/api/useAnalysis";
 import { AnalysisView } from "@/features/analysis/components/AnalysisView";
-import { LoadingView } from "@/features/dashboard/components/LoadingView";
+import AnalyzeLoading from "./loading";
 import { Card } from "@/components/design-system/Card";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 
@@ -25,7 +25,7 @@ export default function AnalyzePage() {
     if (showInitialLoader) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
-                <LoadingView />
+                <AnalyzeLoading />
             </div>
         );
     }

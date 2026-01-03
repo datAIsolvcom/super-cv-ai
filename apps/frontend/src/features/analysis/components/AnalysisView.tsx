@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
-    ArrowRight, Sparkles, Loader2, Info, X,
-    Zap, Check, ChevronDown, Lock, Unlock, Target
+    Sparkles, Loader2, Info, X,
+    Zap, Check, Lock, Unlock, Target
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AnimatedCounter } from "@/components/design-system/AnimatedCounter";
 import { UpgradeModal } from "@/components/design-system/UpgradeModal";
+import { AnimatedCounter } from "@/components/design-system/AnimatedCounter";
 import { useClaimMutation, useCustomizeMutation } from "@/features/analysis/api/useAnalysis";
+import { ScoreCard, getScoreBgColor, getScoreTextColor } from "./ScoreCard";
+import { GapCard } from "./GapCard";
 import type { AnalysisData } from "@/features/analysis/types/analysis.types";
 
 // Animation variants
@@ -275,7 +277,7 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
                             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
                                 {gapsDisplay.length > 0 ? (
                                     gapsDisplay.map((item, i) => (
-                                        <GapActionCard key={i} gapName={item.gap} action={item.action} />
+                                        <GapCard key={i} gapName={item.gap} action={item.action} />
                                     ))
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-40 text-slate-500 text-sm gap-3 opacity-60">
@@ -290,7 +292,7 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {metrics.map((m, i) => (
                             <motion.div variants={itemVariants} key={i}>
-                                <ScoreBox
+                                <ScoreCard
                                     label={m.label} score={m.score} detail={m.detail}
                                     onClick={() => setSelectedMetric({ title: m.label, score: m.score, detail: m.detail })}
                                 />
@@ -299,72 +301,6 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
                     </div>
                 </motion.div>
             )}
-        </div>
-    );
-}
-
-// Helper Components
-function GapActionCard({ gapName, action }: { gapName: string; action: string }) {
-    const [isOpen, setIsOpen] = useState(false);
-    return (
-        <div className="bg-slate-900 border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-colors group">
-            <button onClick={() => setIsOpen(!isOpen)} className="w-full p-4 flex items-start justify-between gap-3 text-left">
-                <div className="flex gap-3">
-                    <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${isOpen ? "bg-champagne-400" : "bg-slate-600 group-hover:bg-champagne-500/50"}`} />
-                    <span className="text-sm font-medium text-slate-200 group-hover:text-white transition-colors leading-snug">{gapName}</span>
-                </div>
-                <ChevronDown size={16} className={`text-slate-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
-            </button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden bg-slate-950/50">
-                        <div className="p-4 pt-0 pl-9">
-                            <p className="text-xs text-slate-400 leading-relaxed border-l-2 border-champagne-500/20 pl-3 py-1">
-                                <strong className="text-champagne-400 block mb-1 text-[10px] uppercase tracking-wider">Recommended Action</strong>
-                                {action}
-                            </p>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    );
-}
-
-function getScoreTextColor(score: number) {
-    if (score >= 80) return "text-emerald-400";
-    if (score >= 60) return "text-champagne-400";
-    return "text-red-400";
-}
-
-function getScoreBgColor(score: number) {
-    if (score >= 80) return "text-emerald-400 bg-emerald-400/10";
-    if (score >= 60) return "text-champagne-400 bg-champagne-400/10";
-    return "text-red-400 bg-red-400/10";
-}
-
-function ScoreBox({ label, score, detail, onClick }: { label: string; score: number; detail: string; onClick: () => void }) {
-    const textColor = getScoreTextColor(score);
-
-    return (
-        <div onClick={onClick} className="glass-panel p-6 rounded-[24px] cursor-pointer hover:bg-slate-800/50 transition-all group flex flex-col justify-between h-full relative overflow-hidden border-b-4 border-b-transparent hover:border-b-champagne-500/30">
-            <div className="flex justify-between items-start mb-4">
-                <div className="text-slate-400 text-xs font-bold uppercase tracking-wider">{label}</div>
-                <div className="w-8 h-8 rounded-full bg-slate-950 border border-white/5 flex items-center justify-center">
-                    <ArrowRight size={14} className="text-slate-500 -rotate-45 group-hover:rotate-0 transition-transform" />
-                </div>
-            </div>
-
-            <div className="mb-2">
-                <span className={`text-4xl font-bold tracking-tight ${textColor}`}>
-                    <AnimatedCounter value={score} />
-                </span>
-                <span className="text-sm text-slate-600 font-medium ml-1">/100</span>
-            </div>
-
-            <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 h-9 group-hover:text-slate-400 transition-colors">
-                {detail || "Click to see detailed analysis."}
-            </p>
         </div>
     );
 }

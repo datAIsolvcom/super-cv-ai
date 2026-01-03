@@ -5,7 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useCvQuery } from "@/features/analysis/api/useAnalysis";
 import { useEditorStore } from "@/features/editor/stores/useEditorStore";
 import { EditorLayout } from "@/features/editor/components/EditorLayout";
-import { LoadingView } from "@/features/dashboard/components/LoadingView";
+// import { LoadingView } from "@/features/dashboard/components/LoadingView";
+import EditorLoading from "./loading";
 import { Card } from "@/components/design-system/Card";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import type { CvData } from "@/features/editor/types/editor.types";
@@ -42,7 +43,7 @@ export default function EditorPage() {
     if (showInitialLoader) {
         return (
             <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
-                <LoadingView />
+                <EditorLoading />
                 <p className="mt-8 text-slate-400 font-serif animate-pulse tracking-wide">
                     Preparing Executive Workspace...
                 </p>

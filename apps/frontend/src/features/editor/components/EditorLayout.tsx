@@ -4,11 +4,14 @@ import { useState, useRef } from "react";
 import { useEditorStore } from "../stores/useEditorStore";
 import { CvEditor } from "./CvEditor";
 import { RibbonBar } from "./RibbonBar";
-import { Check, Sparkles, ArrowLeft, Cpu, FileText, Loader2 } from "lucide-react";
+import { SuggestionCard } from "./SuggestionCard";
+import EditorLoading from "@/app/cv/[id]/editor/loading";
+import { Check, Sparkles, ArrowLeft, Cpu, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import type { CvData, SectionType } from "../types/editor.types";
+
 
 export function EditorLayout() {
     const aiDraft = useEditorStore((s) => s.aiDraft);
@@ -22,67 +25,13 @@ export function EditorLayout() {
     const printRef = useRef<HTMLDivElement>(null);
 
     // ============================================
-    // Show premium loading while Zustand store is being populated
+    // Show EditorLoading while Zustand store is being populated
     // This prevents the "flash of no content" issue
     // ============================================
     if (!aiDraft || !cvData) {
-        return (
-            <div className="fixed inset-0 h-[100dvh] z-[100] bg-slate-950 flex items-center justify-center overflow-hidden">
-                {/* Ambient background */}
-                <div className="absolute inset-0 pointer-events-none">
-                    <motion.div
-                        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute top-1/3 left-1/3 w-[400px] h-[400px] bg-champagne-500/20 rounded-full blur-[100px]"
-                    />
-                    <motion.div
-                        animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
-                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                        className="absolute bottom-1/3 right-1/3 w-[300px] h-[300px] bg-indigo-500/15 rounded-full blur-[80px]"
-                    />
-                </div>
-
-                <div className="relative z-10 flex flex-col items-center">
-                    {/* Animated icon */}
-                    <div className="relative mb-8">
-                        <motion.div
-                            animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0, 0.4] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute inset-0 w-24 h-24 border-2 border-champagne-500/30 rounded-full"
-                        />
-                        <motion.div
-                            animate={{ scale: [1, 1.05, 1] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            className="w-24 h-24 bg-gradient-to-br from-champagne-400 via-orange-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-[0_0_60px_rgba(245,158,11,0.4)]"
-                        >
-                            <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                className="absolute inset-2 border-2 border-white/20 rounded-xl border-t-white/60"
-                            />
-                            <Loader2 size={36} className="text-white animate-spin relative z-10" />
-                        </motion.div>
-                    </div>
-
-                    <motion.h2
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-2xl font-serif font-bold text-white mb-2 tracking-tight"
-                    >
-                        Loading Editor
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-slate-400 text-sm"
-                    >
-                        Preparing your optimized CV workspace...
-                    </motion.p>
-                </div>
-            </div>
-        );
+        return <EditorLoading />;
     }
+
 
     const findBestMatchIndex = (aiItem: { company?: string; title?: string }, userList: { company?: string; title?: string }[], aiIndex: number) => {
         if (!userList || userList.length === 0) return -1;
@@ -252,23 +201,5 @@ export function EditorLayout() {
                 </button>
             </div>
         </div>
-    );
-}
-
-// Suggestion Card Component
-function SuggestionCard({ title, badge, content, onApply }: { title: string; badge?: string; content: React.ReactNode; onApply: () => void }) {
-    return (
-        <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="glass-panel p-4 rounded-xl border border-white/5 mb-4">
-            <div className="flex justify-between items-start mb-2">
-                <div>
-                    {badge && <span className="text-[10px] text-indigo-400 font-bold uppercase">{badge}</span>}
-                    <h4 className="font-bold text-sm text-white">{title}</h4>
-                </div>
-                <button onClick={onApply} className="text-xs bg-indigo-600 px-3 py-1.5 rounded-lg text-white font-bold flex items-center gap-1">
-                    <Check size={12} /> Apply
-                </button>
-            </div>
-            <div className="text-xs text-slate-400 pl-2 border-l-2 border-white/10">{content}</div>
-        </motion.div>
     );
 }
