@@ -21,13 +21,8 @@ export function EditorLayout() {
     const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
     const [mobileTab, setMobileTab] = useState<"ai" | "preview">("preview");
 
-    // Create a ref for printing
     const printRef = useRef<HTMLDivElement>(null);
 
-    // ============================================
-    // Show EditorLoading while Zustand store is being populated
-    // This prevents the "flash of no content" issue
-    // ============================================
     if (!aiDraft || !cvData) {
         return <EditorLoading />;
     }
@@ -74,21 +69,21 @@ export function EditorLayout() {
     const missingSkills = (aiDraft.hard_skills || []).filter((s: string) => !(cvData.hard_skills || []).includes(s));
 
     return (
-        <div className="fixed inset-0 h-[100dvh] z-[100] bg-slate-950 flex flex-col md:flex-row overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none z-0"></div>
+        <div className="fixed inset-0 h-[100dvh] z-[100] bg-stone-100 dark:bg-slate-950 flex flex-col md:flex-row overflow-hidden transition-colors">
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 dark:opacity-20 pointer-events-none z-0"></div>
 
-            {/* AI Suggestions Sidebar */}
+
             <aside
                 className={cn(
-                    "w-full md:w-[400px] lg:w-[450px] bg-slate-900/95 backdrop-blur-xl border-r border-white/5 flex flex-col z-30 shadow-2xl transition-transform duration-300 absolute inset-0 md:relative",
+                    "w-full md:w-[400px] lg:w-[450px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200 dark:border-white/5 flex flex-col z-30 shadow-2xl transition-all duration-300 absolute inset-0 md:relative",
                     mobileTab === "ai" ? "translate-x-0" : "-translate-x-full md:translate-x-0"
                 )}
             >
-                <div className="p-4 md:p-6 border-b border-white/5 flex justify-between items-center bg-slate-950/30">
-                    <div className="flex items-center gap-2 text-white font-serif font-bold text-lg">
-                        <Cpu size={18} className="text-indigo-400" /> AI Review
+                <div className="p-4 md:p-6 border-b border-slate-200 dark:border-white/5 flex justify-between items-center bg-slate-50 dark:bg-slate-950/30">
+                    <div className="flex items-center gap-2 text-slate-900 dark:text-white font-serif font-bold text-lg">
+                        <Cpu size={18} className="text-indigo-500 dark:text-indigo-400" /> AI Review
                     </div>
-                    <Link href="/" className="p-2 hover:bg-white/5 rounded-full text-slate-400">
+                    <Link href="/" className="p-2 hover:bg-slate-200 dark:hover:bg-white/5 rounded-full text-slate-500 dark:text-slate-400">
                         <ArrowLeft size={18} />
                     </Link>
                 </div>
@@ -110,7 +105,7 @@ export function EditorLayout() {
                                 content={
                                     <div className="flex flex-wrap gap-2">
                                         {missingSkills.map((s: string, i: number) => (
-                                            <span key={i} className="text-xs px-2 py-1 bg-slate-800 rounded border border-white/10 text-emerald-300">
+                                            <span key={i} className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-white/10 text-emerald-600 dark:text-emerald-300">
                                                 + {s}
                                             </span>
                                         ))}
@@ -130,7 +125,7 @@ export function EditorLayout() {
                                         title={`Refine: ${aiExp.title}`}
                                         badge="Experience"
                                         content={
-                                            <ul className="list-disc ml-4 space-y-1 text-xs text-slate-300">
+                                            <ul className="list-disc ml-4 space-y-1 text-xs text-slate-600 dark:text-slate-300">
                                                 {(aiExp.achievements || []).slice(0, 3).map((a: string, i: number) => (
                                                     <li key={i}>{a}</li>
                                                 ))}
@@ -147,7 +142,7 @@ export function EditorLayout() {
                             const match = findBestMatchIndex(aiExp, (cvData.work_experience || []), idx);
                             return appliedIds.has(`work_experience-${idx}`) || match === -1;
                         }) && (
-                            <div className="text-center py-10 opacity-50 text-slate-400">
+                            <div className="text-center py-10 opacity-50 text-slate-500 dark:text-slate-400">
                                 <Check size={32} className="mx-auto mb-2 text-emerald-500" />
                                 All suggestions applied!
                             </div>
@@ -155,20 +150,20 @@ export function EditorLayout() {
                 </div>
             </aside>
 
-            {/* Main Editor Area */}
+
             <main
                 className={cn(
-                    "flex-1 bg-slate-950 relative flex flex-col h-full overflow-hidden transition-all duration-300 z-10",
+                    "flex-1 bg-slate-200 dark:bg-slate-950 relative flex flex-col h-full overflow-hidden transition-all duration-300 z-10",
                     mobileTab === "ai" ? "translate-x-full md:translate-x-0 hidden md:flex" : "translate-x-0 flex"
                 )}
             >
-                <div className="flex-1 w-full h-full overflow-y-auto custom-scrollbar flex flex-col items-center bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:20px_20px] pb-40 md:pb-16">
+                <div className="flex-1 w-full h-full overflow-y-auto custom-scrollbar flex flex-col items-center bg-[radial-gradient(#94a3b8_1px,transparent_1px)] dark:bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:20px_20px] pb-40 md:pb-16">
                     <div className="w-full sticky top-0 z-40 p-4">
                         <RibbonBar printRef={printRef} />
                     </div>
 
                     <div
-                        className="relative shrink-0 w-[210mm] min-h-[297mm] h-fit bg-white text-slate-900 shadow-[0_0_60px_rgba(0,0,0,0.6)] 
+                        className="relative shrink-0 w-[210mm] min-h-[297mm] h-fit bg-white text-slate-900 shadow-[0_0_60px_rgba(0,0,0,0.3)] dark:shadow-[0_0_60px_rgba(0,0,0,0.6)] 
               transform-gpu origin-top 
               scale-[0.42] sm:scale-[0.6] md:scale-100
               mt-4
@@ -179,13 +174,13 @@ export function EditorLayout() {
                 </div>
             </main>
 
-            {/* Mobile Nav */}
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-white/10 p-4 z-50 flex gap-4 pb-8 safe-area-pb">
+
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 p-4 z-50 flex gap-4 pb-8 safe-area-pb">
                 <button
                     onClick={() => setMobileTab("ai")}
                     className={cn(
                         "flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2",
-                        mobileTab === "ai" ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-400"
+                        mobileTab === "ai" ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                     )}
                 >
                     <Cpu size={16} /> Suggestions
@@ -194,7 +189,7 @@ export function EditorLayout() {
                     onClick={() => setMobileTab("preview")}
                     className={cn(
                         "flex-1 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2",
-                        mobileTab === "preview" ? "bg-champagne-500 text-slate-950" : "bg-slate-800 text-slate-400"
+                        mobileTab === "preview" ? "bg-amber-500 text-slate-950" : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                     )}
                 >
                     <FileText size={16} /> Preview

@@ -33,16 +33,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async redirect({ url, baseUrl }) {
-      // Allow relative URLs
+
       if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allow same-origin URLs
+
       if (new URL(url).origin === baseUrl) return url;
-      // Default to base if external
+
       return baseUrl;
     },
     async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id; // Default ID
+        token.id = user.id;
 
 
         if (account?.provider === "google") {

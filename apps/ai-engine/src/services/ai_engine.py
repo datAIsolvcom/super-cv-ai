@@ -8,7 +8,7 @@ from src.schemas import AnalysisResponse, ImprovedCVResult, CVContactInfo
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-MODEL_NAME = "gemini-2.5-flash" 
+MODEL_NAME = "gemini-3-flash-preview" 
 def clean_json_text(text: str) -> str:
     try:
         if "```json" in text:

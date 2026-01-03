@@ -7,58 +7,38 @@ import type {
     TemplateType,
 } from "../types/editor.types";
 
-// =============================================================================
-// State Interface
-// =============================================================================
 
 interface EditorState {
-    // CV Data
     cvData: CvData | null;
     aiDraft: CvData | null;
-
-    // Editor Settings
     sectionOrder: SectionType[];
     design: DesignSettings;
     template: TemplateType;
-
-    // UI State
     isSidebarOpen: boolean;
     activeSection: SectionType | null;
 }
 
 interface EditorActions {
-    // Data Setters
     setCvData: (data: CvData | null) => void;
     setAiDraft: (data: CvData | null) => void;
-
-    // Field Updates
     updateCvField: (path: string, value: unknown) => void;
-
-    // Section Reordering
     reorderSections: (newOrder: SectionType[]) => void;
-
-    // AI Suggestion Application
     applySuggestion: (
         section: keyof CvData,
         content: unknown,
         index?: number
     ) => void;
 
-    // Design Settings
+
     setDesign: (design: Partial<DesignSettings>) => void;
     setTemplate: (template: TemplateType) => void;
-
-    // UI Actions
     toggleSidebar: () => void;
     setActiveSection: (section: SectionType | null) => void;
 
-    // Reset
+
     reset: () => void;
 }
 
-// =============================================================================
-// Default Values
-// =============================================================================
 
 const defaultDesign: DesignSettings = {
     fontFamily: "font-sans",
@@ -88,17 +68,12 @@ const initialState: EditorState = {
     activeSection: null,
 };
 
-// =============================================================================
-// Store
-// =============================================================================
 
 export const useEditorStore = create<EditorState & EditorActions>()(
     immer((set, get) => ({
         ...initialState,
 
-        // -------------------------------------------------------------------------
-        // Data Setters
-        // -------------------------------------------------------------------------
+
         setCvData: (data) =>
             set((state) => {
                 state.cvData = data;
@@ -109,9 +84,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
                 state.aiDraft = data;
             }),
 
-        // -------------------------------------------------------------------------
-        // Field Updates - Handles nested paths like "contact_info.email"
-        // -------------------------------------------------------------------------
+
         updateCvField: (path, value) =>
             set((state) => {
                 if (!state.cvData) return;
@@ -130,38 +103,32 @@ export const useEditorStore = create<EditorState & EditorActions>()(
                 current[keys[keys.length - 1]] = value;
             }),
 
-        // -------------------------------------------------------------------------
-        // Section Reordering
-        // -------------------------------------------------------------------------
+
         reorderSections: (newOrder) =>
             set((state) => {
                 state.sectionOrder = newOrder;
             }),
 
-        // -------------------------------------------------------------------------
-        // AI Suggestion Application
-        // -------------------------------------------------------------------------
+
         applySuggestion: (section, content, index) =>
             set((state) => {
                 if (!state.cvData) return;
 
                 if (section === "hard_skills" || section === "soft_skills") {
-                    // Merge skills without duplicates
+
                     const existing = state.cvData[section] as string[];
                     const newItems = content as string[];
                     state.cvData[section] = [...new Set([...existing, ...newItems])];
                 } else if (index !== undefined && Array.isArray(state.cvData[section])) {
-                    // Update array item at index
+
                     (state.cvData[section] as unknown[])[index] = content;
                 } else {
-                    // Direct assignment
+
                     (state.cvData as Record<string, unknown>)[section] = content;
                 }
             }),
 
-        // -------------------------------------------------------------------------
-        // Design Settings
-        // -------------------------------------------------------------------------
+
         setDesign: (newDesign) =>
             set((state) => {
                 state.design = { ...state.design, ...newDesign };
@@ -172,9 +139,7 @@ export const useEditorStore = create<EditorState & EditorActions>()(
                 state.template = template;
             }),
 
-        // -------------------------------------------------------------------------
-        // UI Actions
-        // -------------------------------------------------------------------------
+
         toggleSidebar: () =>
             set((state) => {
                 state.isSidebarOpen = !state.isSidebarOpen;
@@ -185,16 +150,12 @@ export const useEditorStore = create<EditorState & EditorActions>()(
                 state.activeSection = section;
             }),
 
-        // -------------------------------------------------------------------------
-        // Reset
-        // -------------------------------------------------------------------------
+
         reset: () => set(initialState),
     }))
 );
 
-// =============================================================================
-// Selectors (for performance optimization)
-// =============================================================================
+
 
 export const selectCvData = (state: EditorState & EditorActions) => state.cvData;
 export const selectDesign = (state: EditorState & EditorActions) => state.design;

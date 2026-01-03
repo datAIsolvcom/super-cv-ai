@@ -11,10 +11,6 @@ interface SuggestionCardProps {
     onApply: () => void;
 }
 
-/**
- * SuggestionCard - Displays an AI suggestion with apply button
- * Used in the editor sidebar for AI-powered recommendations
- */
 export function SuggestionCard({ title, badge, content, onApply }: SuggestionCardProps) {
     return (
         <motion.div
@@ -22,16 +18,16 @@ export function SuggestionCard({ title, badge, content, onApply }: SuggestionCar
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="glass-panel p-4 rounded-xl border border-white/5 mb-4"
+            className="glass-panel p-4 rounded-xl mb-4"
         >
             <div className="flex justify-between items-start mb-2">
                 <div>
                     {badge && (
-                        <span className="text-[10px] text-indigo-400 font-bold uppercase">
+                        <span className="text-[10px] text-indigo-500 dark:text-indigo-400 font-bold uppercase">
                             {badge}
                         </span>
                     )}
-                    <h4 className="font-bold text-sm text-white">{title}</h4>
+                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">{title}</h4>
                 </div>
                 <button
                     onClick={onApply}
@@ -40,7 +36,7 @@ export function SuggestionCard({ title, badge, content, onApply }: SuggestionCar
                     <Check size={12} /> Apply
                 </button>
             </div>
-            <div className="text-xs text-slate-400 pl-2 border-l-2 border-white/10">
+            <div className="text-xs text-slate-600 dark:text-slate-400 pl-2 border-l-2 border-slate-200 dark:border-white/10">
                 {content}
             </div>
         </motion.div>

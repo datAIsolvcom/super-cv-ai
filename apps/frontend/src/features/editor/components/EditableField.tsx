@@ -12,29 +12,30 @@ interface EditableFieldProps {
   style?: React.CSSProperties;
 }
 
-export function EditableField({ value, onSave, className, tagName = "div", placeholder }: EditableFieldProps) {
+export function EditableField({ value, onSave, className, tagName = "div", placeholder, style }: EditableFieldProps) {
   const [content, setContent] = useState(value);
   const containerRef = useRef<HTMLElement>(null);
 
-  
+
   useEffect(() => {
     if (value !== containerRef.current?.innerHTML) {
-        setContent(value);
+      setContent(value);
     }
   }, [value]);
 
   const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
     const html = e.currentTarget.innerHTML;
     if (html !== value) {
-        onSave(html); 
+      onSave(html);
     }
   };
 
-  const Tag = tagName as any;
+  const Tag = tagName as React.ElementType;
 
   return (
     <Tag
       ref={containerRef}
+      style={style}
       className={cn(
         "outline-none focus:bg-blue-50/50 focus:ring-1 focus:ring-blue-300 rounded px-1 transition-all min-w-[20px] empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 cursor-text hover:bg-slate-50",
         className

@@ -9,10 +9,10 @@ import { Toaster } from "sonner";
 import { AuthToast } from "@/components/auth-toast";
 import { Suspense } from "react";
 import { ScrollProgress } from "@/components/design-system/ScrollProgress";
+import { ThemeHydration } from "@/components/providers/ThemeHydration";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
-
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://supercv.ai'),
@@ -24,8 +24,6 @@ export const metadata: Metadata = {
   keywords: ["resume", "CV", "AI", "ATS", "job search", "career", "resume builder", "resume analyzer"],
   authors: [{ name: "Super CV" }],
   creator: "Super CV",
-
-
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -42,27 +40,20 @@ export const metadata: Metadata = {
       }
     ]
   },
-
-
   twitter: {
     card: "summary_large_image",
     title: "Super CV | AI-Powered Resume Architect",
     description: "Transform your career with AI-powered resume analysis.",
     images: ["/og-image.png"],
   },
-
-
   robots: {
     index: true,
     follow: true,
   },
-
-
   icons: {
     icon: "/favicon.ico",
   },
 };
-
 
 export default function RootLayout({
   children,
@@ -70,19 +61,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <body className={cn(
-        "min-h-screen font-sans selection:bg-[hsla(38,92%,50%,0.3)] selection:text-[hsl(38,92%,70%)]",
+        "min-h-screen font-sans",
         inter.variable,
         playfair.variable
       )}>
         <ScrollProgress />
         <AuthProvider>
           <QueryProvider>
+            <ThemeHydration />
             <Navbar />
             <main className="pt-24 min-h-screen">
               {children}
-              <Toaster position="top-center" richColors theme="dark" />
+              <Toaster position="top-center" richColors />
               <Suspense fallback={null}>
                 <AuthToast />
               </Suspense>

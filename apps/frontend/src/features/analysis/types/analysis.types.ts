@@ -1,7 +1,3 @@
-// =============================================================================
-// Analysis Types - Ported from legacy cv-context.tsx
-// =============================================================================
-
 export interface CriticalGap {
     gap: string;
     action: string;
@@ -27,7 +23,7 @@ export interface AnalysisData {
 
 export type CvStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
 
-// Import CvData type inline to avoid circular dependencies
+
 export interface CvRecord {
     id: string;
     userId?: string | null;

@@ -97,7 +97,7 @@ export function CvEditor({ printRef }: CvEditorProps) {
                   <div className="flex flex-col gap-0.5">
                     {(exp.achievements || []).map((bullet, idx) => (
                       <div key={idx} className="flex items-start group/bullet relative">
-                        <span className="mt-[0.6em] mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-800 print:bg-black" />
+                        <span className="mt-[0.6em] mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-800" style={{ backgroundColor: '#1e293b', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} />
                         <div className={`flex-1 text-slate-700 text-justify`}>
                           <EditableField tagName="span" value={bullet} className="inline" onSave={(v) => { const newAch = [...exp.achievements]; newAch[idx] = v; updateCvField(`work_experience[${i}].achievements`, newAch); }} />
                         </div>
@@ -127,7 +127,7 @@ export function CvEditor({ printRef }: CvEditorProps) {
       className={cn("bg-white text-slate-900 w-full h-full", design.fontFamily, design.pageMargin, design.fontSize, design.lineHeight)}
     >
       <header className={`border-b-2 pb-4 mb-4 flex flex-col items-center text-center ${template === "minimal" ? "items-start text-left border-none" : ""}`} style={{ borderColor: design.accentColor }}>
-        <EditableField tagName="h1" className="text-[2.5em] font-bold uppercase tracking-wider mb-2 text-slate-900 leading-none" style={{ color: design.accentColor }} value={cvData.full_name || "Name"} onSave={(v) => updateCvField("full_name", v)} />
+        <EditableField tagName="h1" className="text-[2.5em] font-bold uppercase tracking-wider mb-2 leading-none" style={{ color: design.accentColor || '#000000' }} value={cvData.full_name || "Name"} onSave={(v) => updateCvField("full_name", v)} />
         <div className={`flex flex-wrap gap-x-4 gap-y-1 text-[0.9em] text-slate-600 ${template === "minimal" ? "justify-start" : "justify-center"}`}>
           {contact.email && <div className="flex items-center gap-1"><Mail size={14} /><EditableField tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
           {contact.phone && <div className="flex items-center gap-1"><Phone size={14} /><EditableField tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
@@ -160,7 +160,7 @@ export function CvEditor({ printRef }: CvEditorProps) {
   );
 }
 
-// Helpers
+
 function SectionHeader({ title, design, className }: { title: string; design: { accentColor: string }; className?: string }) {
   return (
     <div className={cn("flex justify-between items-center mb-2 border-b pb-1", className)} style={{ borderColor: design.accentColor }}>
@@ -185,7 +185,7 @@ function renderProjects(cvData: CvData, design: { accentColor: string; sectionSp
             <div className="flex flex-col gap-0.5">
               {(proj.highlights || []).map((h, idx) => (
                 <div key={idx} className="flex items-start group/bullet relative">
-                  <span className="mt-[0.6em] mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-800 print:bg-black" />
+                  <span className="mt-[0.6em] mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-800" style={{ backgroundColor: '#1e293b', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} />
                   <div className="flex-1 text-slate-700 text-justify">
                     <EditableField tagName="span" value={h} className="inline" onSave={(v) => { const nh = [...proj.highlights]; nh[idx] = v; update(`projects[${i}].highlights`, nh); }} />
                   </div>

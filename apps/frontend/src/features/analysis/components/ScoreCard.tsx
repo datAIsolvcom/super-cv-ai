@@ -7,15 +7,15 @@ import { motion } from "framer-motion";
 import { luxuryEasing } from "@/lib/animations";
 
 export function getScoreTextColor(score: number) {
-    if (score >= 80) return "text-emerald-400";
-    if (score >= 60) return "text-[hsl(38,92%,65%)]";
-    return "text-red-400";
+    if (score >= 80) return "text-emerald-500 dark:text-emerald-400";
+    if (score >= 60) return "text-amber-600 dark:text-amber-400";
+    return "text-red-500 dark:text-red-400";
 }
 
 export function getScoreBgColor(score: number) {
-    if (score >= 80) return "text-emerald-400 bg-emerald-400/10";
-    if (score >= 60) return "text-[hsl(38,92%,65%)] bg-[hsla(38,92%,50%,0.1)]";
-    return "text-red-400 bg-red-400/10";
+    if (score >= 80) return "text-emerald-500 dark:text-emerald-400 bg-emerald-400/10";
+    if (score >= 60) return "text-amber-600 dark:text-amber-400 bg-amber-500/10";
+    return "text-red-500 dark:text-red-400 bg-red-400/10";
 }
 
 interface ScoreCardProps {
@@ -29,38 +29,30 @@ export function ScoreCard({ label, score, detail, onClick }: ScoreCardProps) {
     const textColor = getScoreTextColor(score);
 
     return (
-        <TiltCard
-            className="h-full"
-            tiltStrength={25}
-            glareEnabled={true}
-        >
+        <TiltCard className="h-full" tiltStrength={25} glareEnabled={true}>
             <motion.div
                 onClick={onClick}
-                whileHover={{
-                    y: -4,
-                    transition: { duration: 0.5, ease: luxuryEasing.power4 }
-                }}
+                whileHover={{ y: -4, transition: { duration: 0.5, ease: luxuryEasing.power4 } }}
                 whileTap={{ scale: 0.98 }}
                 className="glass-panel p-[clamp(1.25rem,3vw,1.75rem)] rounded-[clamp(1.25rem,3vw,2rem)] cursor-pointer h-full
                            flex flex-col justify-between relative overflow-hidden
-                           border-b-2 border-b-transparent hover:border-b-[hsla(38,92%,50%,0.4)]
+                           border-b-2 border-b-transparent hover:border-b-amber-500/40
                            transition-[border-color] duration-500"
             >
-
                 <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[hsla(38,92%,50%,0.05)] to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent" />
                 </div>
 
                 <div className="flex justify-between items-start mb-4 relative z-10">
-                    <div className="text-[hsl(215,20%,50%)] text-xs font-bold uppercase tracking-wider">
+                    <div className="text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
                         {label}
                     </div>
                     <motion.div
-                        className="w-8 h-8 rounded-full bg-[hsl(222,47%,8%)] border border-white/5 flex items-center justify-center"
+                        className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-white/5 flex items-center justify-center"
                         whileHover={{ scale: 1.1, backgroundColor: "hsla(38,92%,50%,0.1)" }}
                         transition={{ duration: 0.3 }}
                     >
-                        <ArrowRight size={14} className="text-[hsl(215,20%,45%)] -rotate-45 group-hover:rotate-0 transition-transform duration-500" />
+                        <ArrowRight size={14} className="text-slate-400 -rotate-45" />
                     </motion.div>
                 </div>
 
@@ -68,10 +60,10 @@ export function ScoreCard({ label, score, detail, onClick }: ScoreCardProps) {
                     <span className={`text-4xl font-bold tracking-tight ${textColor}`}>
                         <OdometerCounter value={score} />
                     </span>
-                    <span className="text-sm text-[hsl(215,20%,35%)] font-medium ml-1">/100</span>
+                    <span className="text-sm text-slate-400 dark:text-slate-500 font-medium ml-1">/100</span>
                 </div>
 
-                <p className="text-xs text-[hsl(215,20%,50%)] leading-relaxed line-clamp-2 h-9 relative z-10">
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 h-9 relative z-10">
                     {detail || "Click to see detailed analysis."}
                 </p>
             </motion.div>

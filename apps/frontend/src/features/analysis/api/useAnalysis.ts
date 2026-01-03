@@ -1,15 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CvRecord, CvStatus } from "../types/analysis.types";
 
-// =============================================================================
-// API Configuration
-// =============================================================================
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-// =============================================================================
-// API Functions
-// =============================================================================
 
 async function fetchCvStatus(cvId: string): Promise<CvRecord> {
     const response = await fetch(`${API_BASE_URL}/cv/${cvId}`);
@@ -105,54 +99,42 @@ async function customizeCv(payload: CustomizePayload): Promise<{ message: string
     return response.json();
 }
 
-// =============================================================================
-// Query Keys
-// =============================================================================
 
 export const analysisKeys = {
     all: ["analysis"] as const,
     cv: (id: string) => [...analysisKeys.all, "cv", id] as const,
 };
 
-// =============================================================================
-// Hooks
-// =============================================================================
 
-/**
- * useCvQuery - Fetches CV data with automatic polling for pending/processing states
- * Replaces legacy useCvPolling hook with TanStack Query
- */
 export function useCvQuery(cvId: string | null) {
     return useQuery({
         queryKey: analysisKeys.cv(cvId || ""),
         queryFn: () => fetchCvStatus(cvId!),
         enabled: !!cvId,
-        // Poll every 2 seconds while status is PENDING or PROCESSING
+
         refetchInterval: (query) => {
             const status = query.state.data?.status;
             if (status === "COMPLETED" || status === "FAILED") {
-                return false; // Stop polling
+                return false;
             }
-            return 2000; // Continue polling
+            return 2000;
         },
-        // Retry on failure
+
         retry: 3,
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
-        // Keep data fresh
+
         staleTime: 1000,
     });
 }
 
-/**
- * useAnalyzeMutation - Handles CV file upload and analysis
- */
+
 export function useAnalyzeMutation() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: analyzeCv,
         onSuccess: (data) => {
-            // Prefetch the new CV data
+
             queryClient.prefetchQuery({
                 queryKey: analysisKeys.cv(data.cvId),
                 queryFn: () => fetchCvStatus(data.cvId),
@@ -161,31 +143,27 @@ export function useAnalyzeMutation() {
     });
 }
 
-/**
- * useClaimMutation - Handles claiming a guest CV for a logged-in user
- */
+
 export function useClaimMutation(cvId: string) {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (userId: string) => claimCv(cvId, userId),
         onSuccess: () => {
-            // Invalidate CV query to refetch with updated ownership
+
             queryClient.invalidateQueries({ queryKey: analysisKeys.cv(cvId) });
         },
     });
 }
 
-/**
- * useCustomizeMutation - Handles AI customization requests
- */
+
 export function useCustomizeMutation() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: customizeCv,
         onSuccess: (_, variables) => {
-            // Invalidate to trigger re-polling for the customized result
+
             queryClient.invalidateQueries({ queryKey: analysisKeys.cv(variables.cvId) });
         },
     });

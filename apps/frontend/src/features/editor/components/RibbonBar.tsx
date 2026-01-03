@@ -83,7 +83,7 @@ export function RibbonBar({ printRef }: RibbonBarProps) {
       {activeDropdown && <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden" onClick={() => setActiveDropdown(null)} />}
 
       <div ref={barRef} className="sticky top-2 z-50 w-[95%] max-w-5xl mx-auto bg-white/95 backdrop-blur-xl shadow-xl rounded-2xl border border-white/20 p-2 mb-6 flex flex-wrap items-center justify-center md:justify-between gap-3 transition-all">
-        {/* Font Controls */}
+
         <div className="flex items-center gap-1 px-1 md:px-2 border-r border-slate-200 shrink-0 relative">
           <button onClick={() => toggleDropdown("font")} className={`flex items-center gap-2 px-2 py-2 rounded-lg text-slate-700 text-sm font-medium transition-colors ${activeDropdown === "font" ? "bg-slate-100" : "hover:bg-slate-100"}`}>
             <Type size={18} />
@@ -115,7 +115,7 @@ export function RibbonBar({ printRef }: RibbonBarProps) {
           )}
         </div>
 
-        {/* Color & Layout Controls */}
+
         <div className="flex items-center gap-1 px-1 md:px-2 border-r border-slate-200 relative shrink-0">
           <div className="relative">
             <button onClick={() => toggleDropdown("color")} className="flex items-center gap-2 hover:bg-slate-100 px-2 py-2 rounded-lg text-slate-700 text-sm font-medium">
@@ -175,7 +175,7 @@ export function RibbonBar({ printRef }: RibbonBarProps) {
           </div>
         </div>
 
-        {/* Template Controls */}
+
         <div className="relative shrink-0">
           <button onClick={() => toggleDropdown("template")} className={`flex items-center gap-2 px-2 py-2 rounded-lg text-slate-700 text-sm font-medium transition-colors ${activeDropdown === "template" ? "bg-slate-100" : "hover:bg-slate-100"}`}>
             <LayoutTemplate size={18} /> <span className="hidden md:inline">Templates</span>
@@ -193,7 +193,7 @@ export function RibbonBar({ printRef }: RibbonBarProps) {
           )}
         </div>
 
-        {/* Print Button */}
+
         <button onClick={() => handlePrint && handlePrint()} className="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-slate-900/20 transition-all active:scale-95 shrink-0 md:ml-auto">
           <Printer size={18} /> <span className="hidden md:inline">Save PDF</span>
         </button>

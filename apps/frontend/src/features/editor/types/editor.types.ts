@@ -1,7 +1,3 @@
-// =============================================================================
-// Editor Types - Ported from legacy cv-context.tsx
-// =============================================================================
-
 export interface CvContactInfo {
     email: string;
     phone: string;

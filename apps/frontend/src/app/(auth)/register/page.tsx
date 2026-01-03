@@ -7,7 +7,6 @@ import { Loader2, ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { staggerContainer, staggerChild, pageVariants, transitions, luxuryEasing } from "@/lib/animations";
 import { TiltCard } from "@/components/design-system/TiltCard";
 
 function RegisterForm() {
@@ -78,58 +77,41 @@ function RegisterForm() {
   return (
     <motion.div
       className="min-h-screen flex items-center justify-center relative overflow-hidden p-4"
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      transition={transitions.pageEntry}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
-
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[hsla(38,92%,50%,0.08)] rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-[hsla(280,80%,60%,0.05)] rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] bg-[hsla(var(--accent-primary)/0.06)] rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-purple-500/[0.04] rounded-full blur-[120px]" />
       </div>
 
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 w-full max-w-md"
-      >
+      <div className="relative z-10 w-full max-w-md">
         <TiltCard tiltStrength={15} glareEnabled={true}>
-          <motion.div
-            variants={staggerChild}
-            className="glass-panel p-[clamp(1.5rem,4vw,2.5rem)] rounded-[clamp(1.5rem,4vw,2.5rem)]"
-          >
+          <div className="glass-panel p-8 rounded-3xl">
+            <Link
+              href="/"
+              className="inline-flex items-center text-[hsl(var(--text-muted))] hover:text-[hsl(var(--accent-primary))] mb-8 text-sm transition-colors duration-300"
+            >
+              <ArrowLeft size={16} className="mr-2" /> Back to Home
+            </Link>
 
-            <motion.div variants={staggerChild}>
-              <Link
-                href="/"
-                className="inline-flex items-center text-[hsl(215,20%,50%)] hover:text-[hsl(38,92%,65%)] mb-8 text-sm transition-colors duration-500"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
-              >
-                <ArrowLeft size={16} className="mr-2" /> Back to Home
-              </Link>
-            </motion.div>
-
-
-            <motion.div variants={staggerChild} className="text-center mb-8">
-              <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-[hsl(280,80%,60%)] to-[hsl(260,80%,50%)] rounded-2xl flex items-center justify-center shadow-[0_0_40px_hsla(280,80%,60%,0.3)]">
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(168,85,247,0.3)]">
                 <UserPlus size={24} className="text-white" />
               </div>
-              <h1 className="text-[clamp(1.5rem,4vw,2rem)] font-serif font-bold text-white mb-2 heading-editorial">
+              <h1 className="text-2xl font-serif font-bold text-[hsl(var(--text-primary))] mb-2">
                 Join Super CV
               </h1>
-              <p className="text-[hsl(215,20%,55%)] text-sm">Create an account to start optimizing</p>
-            </motion.div>
+              <p className="text-[hsl(var(--text-secondary))] text-sm">Create an account to start optimizing</p>
+            </div>
 
-
-            <motion.form variants={staggerChild} onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 placeholder="Full Name"
                 required
-                className="w-full bg-[hsl(222,47%,8%)] border border-white/[0.08] rounded-xl p-4 text-white placeholder:text-[hsl(215,20%,40%)] focus:border-[hsla(38,92%,50%,0.5)] focus:shadow-[0_0_20px_hsla(38,92%,50%,0.15)] outline-none transition-all duration-500"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+                className="w-full bg-[hsl(var(--surface-elevated))] border border-black/[0.06] dark:border-white/[0.08] rounded-xl p-4 text-[hsl(var(--text-primary))] placeholder:text-[hsl(var(--text-muted))] focus:border-[hsla(var(--accent-primary)/0.5)] focus:shadow-[0_0_20px_hsla(var(--accent-primary)/0.15)] outline-none transition-all duration-300"
                 value={name}
                 onChange={e => setName(e.target.value)}
               />
@@ -137,8 +119,7 @@ function RegisterForm() {
                 type="email"
                 placeholder="Email Address"
                 required
-                className="w-full bg-[hsl(222,47%,8%)] border border-white/[0.08] rounded-xl p-4 text-white placeholder:text-[hsl(215,20%,40%)] focus:border-[hsla(38,92%,50%,0.5)] focus:shadow-[0_0_20px_hsla(38,92%,50%,0.15)] outline-none transition-all duration-500"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+                className="w-full bg-[hsl(var(--surface-elevated))] border border-black/[0.06] dark:border-white/[0.08] rounded-xl p-4 text-[hsl(var(--text-primary))] placeholder:text-[hsl(var(--text-muted))] focus:border-[hsla(var(--accent-primary)/0.5)] focus:shadow-[0_0_20px_hsla(var(--accent-primary)/0.15)] outline-none transition-all duration-300"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
@@ -146,38 +127,28 @@ function RegisterForm() {
                 type="password"
                 placeholder="Password"
                 required
-                className="w-full bg-[hsl(222,47%,8%)] border border-white/[0.08] rounded-xl p-4 text-white placeholder:text-[hsl(215,20%,40%)] focus:border-[hsla(38,92%,50%,0.5)] focus:shadow-[0_0_20px_hsla(38,92%,50%,0.15)] outline-none transition-all duration-500"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
+                className="w-full bg-[hsl(var(--surface-elevated))] border border-black/[0.06] dark:border-white/[0.08] rounded-xl p-4 text-[hsl(var(--text-primary))] placeholder:text-[hsl(var(--text-muted))] focus:border-[hsla(var(--accent-primary)/0.5)] focus:shadow-[0_0_20px_hsla(var(--accent-primary)/0.15)] outline-none transition-all duration-300"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
 
-              <motion.button
+              <button
                 disabled={isLoading}
-                whileHover={{ y: -2, boxShadow: "0 0 60px hsla(38,92%,50%,0.4)" }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.5, ease: luxuryEasing.power4 }}
-                className="w-full bg-gradient-to-r from-[hsl(38,92%,50%)] to-[hsl(38,92%,45%)] text-[hsl(222,47%,8%)] font-bold h-14 rounded-xl transition-all duration-500 flex items-center justify-center disabled:opacity-50"
+                className="w-full btn-primary h-14 rounded-xl flex items-center justify-center disabled:opacity-50"
               >
                 {isLoading ? <Loader2 className="animate-spin" /> : "Create Account"}
-              </motion.button>
-            </motion.form>
+              </button>
+            </form>
 
+            <div className="my-6 flex items-center gap-4">
+              <div className="h-px bg-black/[0.06] dark:bg-white/[0.08] flex-1" />
+              <span className="text-xs uppercase text-[hsl(var(--text-muted))] tracking-wider">Or continue with</span>
+              <div className="h-px bg-black/[0.06] dark:bg-white/[0.08] flex-1" />
+            </div>
 
-            <motion.div variants={staggerChild} className="my-6 flex items-center gap-4">
-              <div className="h-px bg-white/[0.08] flex-1" />
-              <span className="text-xs uppercase text-[hsl(215,20%,45%)] tracking-wider">Or continue with</span>
-              <div className="h-px bg-white/[0.08] flex-1" />
-            </motion.div>
-
-
-            <motion.button
-              variants={staggerChild}
+            <button
               onClick={handleGoogleLogin}
-              whileHover={{ y: -2, backgroundColor: "hsl(0,0%,95%)" }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.5, ease: luxuryEasing.power4 }}
-              className="w-full h-14 bg-white text-[hsl(222,47%,8%)] font-medium rounded-xl transition-all duration-500 flex items-center justify-center gap-3"
+              className="w-full h-14 glass-button font-medium rounded-xl flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -186,21 +157,20 @@ function RegisterForm() {
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
               Continue with Google
-            </motion.button>
+            </button>
 
-
-            <motion.p variants={staggerChild} className="mt-8 text-center text-sm text-[hsl(215,20%,55%)]">
+            <p className="mt-8 text-center text-sm text-[hsl(var(--text-secondary))]">
               Already have an account?{" "}
               <Link
                 href={callbackUrl && callbackUrl !== "/" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
-                className="text-[hsl(38,92%,65%)] hover:text-[hsl(38,92%,75%)] transition-colors duration-300"
+                className="text-[hsl(var(--accent-primary))] hover:underline"
               >
                 Sign In
               </Link>
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
         </TiltCard>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -209,7 +179,7 @@ export default function RegisterPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 bg-gradient-to-br from-[hsl(280,80%,60%)] to-[hsl(260,80%,50%)] rounded-2xl flex items-center justify-center animate-pulse">
+        <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center animate-pulse">
           <Loader2 className="animate-spin text-white" size={24} />
         </div>
       </div>
