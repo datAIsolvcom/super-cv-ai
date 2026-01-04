@@ -75,23 +75,23 @@ export default function EditorLoading() {
                     </p>
                 </motion.div>
 
-                <div className="flex items-center gap-6 mb-8">
+                <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-8 px-4 max-w-xs sm:max-w-none">
                     {features.map((feature) => (
                         <motion.div
                             key={feature.label}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.5 + feature.delay }}
-                            className="flex flex-col items-center gap-2"
+                            className="flex flex-col items-center gap-1.5 sm:gap-2 w-16 sm:w-auto"
                         >
                             <motion.div
                                 animate={{ scale: [1, 1.1, 1], boxShadow: ["0 0 0 rgba(245,158,11,0)", "0 0 20px rgba(245,158,11,0.3)", "0 0 0 rgba(245,158,11,0)"] }}
                                 transition={{ duration: 2, repeat: Infinity, delay: feature.delay }}
-                                className="w-12 h-12 bg-slate-100 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center"
+                                className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 dark:bg-white/5 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center"
                             >
-                                <feature.icon size={20} className="text-amber-600 dark:text-amber-400" />
+                                <feature.icon size={18} className="text-amber-600 dark:text-amber-400 sm:w-5 sm:h-5" />
                             </motion.div>
-                            <span className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{feature.label}</span>
+                            <span className="text-[8px] sm:text-[10px] text-slate-500 font-medium uppercase tracking-wider text-center whitespace-nowrap">{feature.label}</span>
                         </motion.div>
                     ))}
                 </div>

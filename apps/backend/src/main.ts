@@ -1,9 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
+import helmet from 'helmet';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
+
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,17 +19,65 @@ async function bootstrap() {
     }),
   );
 
+  app.use(
+    helmet({
+
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:', 'blob:'],
+          connectSrc: ["'self'", process.env.FRONTEND_URL || 'http://localhost:3000'],
+          fontSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
+        },
+      },
+
+      hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+
+      frameguard: { action: 'deny' },
+
+      hidePoweredBy: true,
+
+      noSniff: true,
+
+      xssFilter: true,
+    }),
+  );
+
+
+  const allowedOrigins = [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'http://localhost:3000',
+  ];
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        logger.warn(`Blocked CORS request from: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'userId'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'userId', 'x-user-id'],
   });
 
   await app.listen(3001);
-  console.log(`🚀 Backend running on: ${await app.getUrl()}`);
-  console.log(`🔒 CORS restricted to: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  logger.log(`🚀 Backend running on: ${await app.getUrl()}`);
+  logger.log(`🔒 CORS restricted to: ${allowedOrigins.join(', ')}`);
+  logger.log(`🛡️ Security headers enabled (Helmet.js)`);
 }
 bootstrap();
-

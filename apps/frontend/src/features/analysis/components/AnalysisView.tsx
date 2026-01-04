@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
@@ -10,6 +10,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { UpgradeModal } from "@/components/design-system/UpgradeModal";
 import { AnimatedCounter } from "@/components/design-system/AnimatedCounter";
+import { LazyConfetti } from "@/lib/dynamic-loading";
 import { useClaimMutation, useCustomizeMutation } from "@/features/analysis/api/useAnalysis";
 import { ScoreCard, getScoreBgColor, getScoreTextColor } from "./ScoreCard";
 import { GapCard } from "./GapCard";
@@ -33,6 +34,7 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [stickyMessage, setStickyMessage] = useState<string | null>(null);
+    const [showConfetti, setShowConfetti] = useState(false);
 
     const params = useParams();
     const router = useRouter();
@@ -42,6 +44,14 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
 
     const claimMutation = useClaimMutation(cvId);
     const customizeMutation = useCustomizeMutation();
+
+
+    useEffect(() => {
+        if (analysisResult?.overall_score && analysisResult.overall_score >= 80) {
+            const timer = setTimeout(() => setShowConfetti(true), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [analysisResult?.overall_score]);
 
     const handleUnlock = async () => {
         if (!session?.user?.id) {
@@ -114,6 +124,7 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
     return (
         <div className="max-w-7xl mx-auto w-full relative pb-20">
             <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+            <LazyConfetti trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
 
 
             <AnimatePresence>
@@ -185,7 +196,7 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
 
             {!isUnlocked ? (
                 <div className="max-w-4xl mx-auto py-20 px-4 text-center relative min-h-[600px] flex flex-col items-center justify-center">
-                    {/* Blurred background placeholders */}
+
                     <div className="absolute inset-0 opacity-20 pointer-events-none select-none overflow-hidden blur-sm">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
                             <div className="bg-slate-200 dark:bg-slate-800 h-40 rounded-2xl w-full" />
@@ -203,11 +214,21 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
                             Your CV scored <span className="text-amber-600 dark:text-amber-400 font-bold text-xl">{analysisResult.overall_score}/100</span>.
                             <br /> Unlock to reveal the strategy to improve it.
                         </p>
-                        <button onClick={handleUnlock} disabled={claimMutation.isPending} className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-lg rounded-2xl hover:bg-slate-800 dark:hover:bg-amber-50 transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 shadow-xl">
-                            {claimMutation.isPending ? <Loader2 className="animate-spin text-amber-500" /> : <Unlock size={24} className="text-amber-500" />}
-                            {session ? "Unlock Report (1 Credit)" : "Sign In to Unlock"}
+                        <button
+                            onClick={handleUnlock}
+                            disabled={claimMutation.isPending}
+                            className="w-full py-4 sm:py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-base sm:text-lg rounded-2xl hover:bg-slate-800 dark:hover:bg-amber-50 transition-all transform hover:scale-[1.02] active:scale-95 shadow-xl disabled:opacity-50"
+                        >
+                            <span className="flex items-center justify-center gap-2 sm:gap-3">
+                                {claimMutation.isPending ? (
+                                    <Loader2 className="animate-spin text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
+                                ) : (
+                                    <Unlock className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
+                                )}
+                                <span>{session ? "Unlock Report (1 Credit)" : "Sign In to Unlock"}</span>
+                            </span>
                         </button>
-                        <p className="text-xs text-slate-400 mt-5 font-medium uppercase tracking-wider">{session ? "Instant Access • 1 Credit Deducted" : "Free Plan includes 3 Credits"}</p>
+                        <p className="text-xs text-slate-400 mt-5 font-medium uppercase tracking-wider text-center">{session ? "Instant Access • 1 Credit Deducted" : "Free Plan includes 3 Credits"}</p>
                     </motion.div>
                 </div>
             ) : (

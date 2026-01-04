@@ -7,7 +7,8 @@ import { Loader2, ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { TiltCard } from "@/components/design-system/TiltCard";
+import { LazyTiltCard } from "@/lib/dynamic-loading";
+import { RippleButton } from "@/components/ui/RippleButton";
 
 function RegisterForm() {
   const router = useRouter();
@@ -87,7 +88,7 @@ function RegisterForm() {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <TiltCard tiltStrength={15} glareEnabled={true}>
+        <LazyTiltCard tiltStrength={15} glareEnabled={true}>
           <div className="glass-panel p-8 rounded-3xl">
             <Link
               href="/"
@@ -132,12 +133,15 @@ function RegisterForm() {
                 onChange={e => setPassword(e.target.value)}
               />
 
-              <button
+              <RippleButton
+                type="submit"
+                variant="primary"
+                size="lg"
                 disabled={isLoading}
-                className="w-full btn-primary h-14 rounded-xl flex items-center justify-center disabled:opacity-50"
+                className="w-full h-14"
               >
                 {isLoading ? <Loader2 className="animate-spin" /> : "Create Account"}
-              </button>
+              </RippleButton>
             </form>
 
             <div className="my-6 flex items-center gap-4">
@@ -169,7 +173,7 @@ function RegisterForm() {
               </Link>
             </p>
           </div>
-        </TiltCard>
+        </LazyTiltCard>
       </div>
     </motion.div>
   );

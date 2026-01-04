@@ -29,8 +29,9 @@ export default function EditorPage() {
         }
     }, [data, setCvData, setAiDraft]);
 
-    const showInitialLoader = (isLoading && !data) ||
-        (!data?.originalData && (data?.status === "PENDING" || data?.status === "PROCESSING"));
+
+    const isProcessing = data?.status === "PENDING" || data?.status === "PROCESSING";
+    const showInitialLoader = (isLoading && !data) || isProcessing || !data?.originalData;
 
     if (showInitialLoader) {
         return (
