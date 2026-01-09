@@ -19,17 +19,17 @@ import { HealthController } from './health.controller';
       {
         name: 'short',
         ttl: 1000,  // 1 second
-        limit: 3,   // 3 requests per second 
+        limit: 10,  // 10 requests per second (increased from 3)
       },
       {
         name: 'medium',
         ttl: 10000, // 10 seconds
-        limit: 20,  // 20 requests per 10 seconds
+        limit: 50,  // 50 requests per 10 seconds (increased from 20)
       },
       {
         name: 'long',
         ttl: 60000, // 1 minute
-        limit: 100, // 100 requests per minute
+        limit: 300, // 300 requests per minute (increased from 100)
       },
     ]),
 
