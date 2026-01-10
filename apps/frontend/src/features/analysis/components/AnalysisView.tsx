@@ -28,9 +28,10 @@ const itemVariants = {
 
 interface AnalysisViewProps {
     analysisResult: AnalysisData | null;
+    cvData: import("@/features/analysis/types/analysis.types").CvRecord | null;
 }
 
-export function AnalysisView({ analysisResult }: AnalysisViewProps) {
+export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
     const [selectedMetric, setSelectedMetric] = useState<{ title: string; score: number; detail: string } | null>(null);
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -53,6 +54,13 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
             return () => clearTimeout(timer);
         }
     }, [analysisResult?.overall_score]);
+
+    // Auto-unlock if the CV is already claimed by the current user
+    useEffect(() => {
+        if (cvData?.userId && session?.user?.id && cvData.userId === session.user.id) {
+            setIsUnlocked(true);
+        }
+    }, [cvData?.userId, session?.user?.id]);
 
     const handleUnlock = async () => {
         if (!session?.user?.id) {
@@ -246,7 +254,7 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
                                     <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                                         Your CV Strength
                                     </h2>
-                                    <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-xl">
+                                    <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed max-w-xl text-justify">
                                         {analysisResult.overall_summary}
                                     </p>
                                     <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
@@ -261,17 +269,32 @@ export function AnalysisView({ analysisResult }: AnalysisViewProps) {
                                 </div>
 
                                 <div className="relative w-48 h-48 md:w-56 md:h-56 shrink-0">
-                                    <svg className="w-full h-full transform -rotate-90">
-                                        <circle cx="50%" cy="50%" r="45%" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-200 dark:text-slate-800" />
+                                    {/* Score ring with proper circumference: 2 * π * 90 ≈ 565 */}
+                                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+                                        <circle
+                                            cx="100"
+                                            cy="100"
+                                            r="90"
+                                            stroke="currentColor"
+                                            strokeWidth="12"
+                                            fill="transparent"
+                                            className="text-slate-200 dark:text-slate-800"
+                                        />
                                         <motion.circle
-                                            initial={{ strokeDasharray: "283 283", strokeDashoffset: 283 }}
-                                            animate={{ strokeDashoffset: 283 - (analysisResult.overall_score / 100) * 283 }}
+                                            initial={{ strokeDashoffset: 565 }}
+                                            animate={{ strokeDashoffset: 565 - (analysisResult.overall_score / 100) * 565 }}
                                             transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
-                                            cx="50%" cy="50%" r="45%"
-                                            stroke="url(#gradient)" strokeWidth="8" strokeLinecap="round" fill="transparent"
+                                            cx="100"
+                                            cy="100"
+                                            r="90"
+                                            stroke="url(#scoreGradient)"
+                                            strokeWidth="12"
+                                            strokeLinecap="round"
+                                            fill="transparent"
+                                            strokeDasharray="565"
                                         />
                                         <defs>
-                                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                                 <stop offset="0%" stopColor="#FCD34D" />
                                                 <stop offset="100%" stopColor="#F59E0B" />
                                             </linearGradient>

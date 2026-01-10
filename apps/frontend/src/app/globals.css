@@ -331,6 +331,18 @@ html.dark body::before {
     background: white !important;
     color: black !important;
   }
+
+  /* Preserve hyperlinks in printed PDF */
+  a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+  }
+  
+  /* Remove contentEditable styling for print */
+  [contenteditable] {
+    outline: none !important;
+    background: transparent !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

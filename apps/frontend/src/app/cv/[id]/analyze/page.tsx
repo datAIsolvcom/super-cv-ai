@@ -52,7 +52,7 @@ export default function AnalyzePage() {
 
     return (
         <div className="min-h-screen bg-stone-50 dark:bg-slate-950 pt-20 pb-10 px-4 md:px-8 transition-colors">
-            <AnalysisView analysisResult={data?.analysisResult ?? null} />
+            <AnalysisView analysisResult={data?.analysisResult ?? null} cvData={data ?? null} />
         </div>
     );
 }

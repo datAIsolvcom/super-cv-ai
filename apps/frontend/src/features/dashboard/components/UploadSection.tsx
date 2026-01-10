@@ -10,6 +10,57 @@ import { cn } from "@/lib/utils";
 import { UpgradeModal } from "@/components/design-system/UpgradeModal";
 import { useAnalyzeMutation } from "@/features/analysis/api/useAnalysis";
 
+// File validation constants
+const ALLOWED_EXTENSIONS = ['.pdf', '.docx'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+/**
+ * Validates file type using magic number detection
+ * PDF: %PDF (25 50 44 46)
+ * DOCX: ZIP header (50 4B 03 04)
+ */
+const validateFileType = async (file: File): Promise<boolean> => {
+  const arrayBuffer = await file.slice(0, 4).arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+
+  // PDF magic number: 25 50 44 46 (%PDF)
+  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) {
+    return file.name.toLowerCase().endsWith('.pdf');
+  }
+
+  // DOCX magic number: 50 4B 03 04 (ZIP header)
+  if (bytes[0] === 0x50 && bytes[1] === 0x4B && bytes[2] === 0x03 && bytes[3] === 0x04) {
+    return file.name.toLowerCase().endsWith('.docx');
+  }
+
+  return false;
+};
+
+/**
+ * Validates file for allowed extensions, size, and content type
+ */
+const validateFile = async (file: File): Promise<{ valid: boolean; error?: string }> => {
+  const fileName = file.name.toLowerCase();
+
+  // Check extension
+  if (!ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext))) {
+    return { valid: false, error: "Only PDF and DOCX files are allowed" };
+  }
+
+  // Check size
+  if (file.size > MAX_FILE_SIZE) {
+    return { valid: false, error: "File size exceeds 10MB limit" };
+  }
+
+  // Validate magic number
+  const isValidType = await validateFileType(file);
+  if (!isValidType) {
+    return { valid: false, error: "Invalid file format. The file content doesn't match its extension." };
+  }
+
+  return { valid: true };
+};
+
 export function UploadSection() {
   const [file, setFile] = useState<File | null>(null);
   const [activeTab, setActiveTab] = useState<"general" | "text" | "link">("general");
@@ -17,6 +68,8 @@ export function UploadSection() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   const router = useRouter();
   const { data: session } = useSession();
@@ -33,21 +86,25 @@ export function UploadSection() {
     }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      const droppedFile = e.dataTransfer.files[0];
+      const validation = await validateFile(droppedFile);
+      if (!validation.valid) {
+        toast.error(validation.error || "Invalid file");
+        return;
+      }
+      setFile(droppedFile);
     }
   };
 
-  const handleAnalyze = async () => {
-    if (!file) return;
-
+  const startAnalysis = () => {
     analyzeMutation.mutate(
       {
-        file,
+        file: file!,
         jobDescriptionText: activeTab === "text" ? jobContext : undefined,
         jobDescriptionUrl: activeTab === "link" ? jobContext : undefined,
         userId: session?.user?.id,
@@ -66,11 +123,89 @@ export function UploadSection() {
     );
   };
 
+  const handleAnalyze = () => {
+    if (!file) return;
+
+    // Start 3-second countdown before consuming tokens
+    setCountdown(3);
+
+    const tick = () => {
+      setCountdown(prev => {
+        if (prev === null || prev <= 1) {
+          if (countdownRef.current) clearInterval(countdownRef.current);
+          setCountdown(null);
+          startAnalysis();
+          return null;
+        }
+        return prev - 1;
+      });
+    };
+
+    countdownRef.current = setInterval(tick, 1000);
+  };
+
+  const cancelAnalysis = () => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setCountdown(null);
+    toast.info("Analysis cancelled");
+  };
+
   const isLoading = analyzeMutation.isPending;
 
   return (
     <div className="w-full max-w-4xl mx-auto">
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+
+      {/* Countdown Cancel Overlay */}
+      <AnimatePresence>
+        {countdown !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-10 text-center shadow-2xl max-w-sm mx-4"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 0.5, repeat: Infinity }}
+                className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.4)]"
+              >
+                <span className="text-4xl font-bold text-white">{countdown}</span>
+              </motion.div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Preparing Analysis...</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+                Your CV will be analyzed in {countdown} second{countdown !== 1 ? 's' : ''}
+              </p>
+              <div className="flex flex-col gap-3">
+                <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: '100%' }}
+                    animate={{ width: '0%' }}
+                    transition={{ duration: 3, ease: 'linear' }}
+                    className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                  />
+                </div>
+                <button
+                  onClick={cancelAnalysis}
+                  className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <X size={18} />
+                  Cancel Analysis
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="glass-panel rounded-[32px] p-2 md:p-3 relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
@@ -116,7 +251,18 @@ export function UploadSection() {
                 file ? "border-emerald-500/50 bg-emerald-500/5 border-solid" : ""
               )}
             >
-              <input ref={fileInputRef} type="file" accept=".pdf,.docx" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" />
+              <input ref={fileInputRef} type="file" accept=".pdf,.docx" onChange={async (e) => {
+                const selectedFile = e.target.files?.[0];
+                if (selectedFile) {
+                  const validation = await validateFile(selectedFile);
+                  if (!validation.valid) {
+                    toast.error(validation.error || "Invalid file");
+                    e.target.value = ''; // Reset input
+                    return;
+                  }
+                  setFile(selectedFile);
+                }
+              }} className="hidden" />
 
               <AnimatePresence mode="wait">
                 {file ? (

@@ -30,6 +30,22 @@ export function EditableField({ value, onSave, className, tagName = "div", place
     }
   };
 
+  // Handle clicks on hyperlinks - Ctrl/Cmd+click to open in new tab
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    const target = e.target as HTMLElement;
+
+    // Check if clicked on a link element
+    const linkElement = target.closest('a');
+    if (linkElement) {
+      const href = linkElement.getAttribute('href');
+      if (href && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        e.stopPropagation();
+        window.open(href, '_blank', 'noopener,noreferrer');
+      }
+    }
+  };
+
   const Tag = tagName as React.ElementType;
 
   return (
@@ -38,13 +54,17 @@ export function EditableField({ value, onSave, className, tagName = "div", place
       style={style}
       className={cn(
         "outline-none focus:bg-blue-50/50 focus:ring-1 focus:ring-blue-300 rounded px-1 transition-all min-w-[20px] empty:before:content-[attr(data-placeholder)] empty:before:text-slate-400 cursor-text hover:bg-slate-50",
+        "[&_a]:text-blue-600 [&_a]:underline [&_a]:cursor-pointer [&_a]:hover:text-blue-800",
         className
       )}
       contentEditable
       suppressContentEditableWarning={true}
       onBlur={handleBlur}
+      onClick={handleClick}
+      onMouseDown={(e: React.MouseEvent) => e.stopPropagation()}
       dangerouslySetInnerHTML={{ __html: content }}
       data-placeholder={placeholder}
+      title="Ctrl+click to open links"
     />
   );
 }

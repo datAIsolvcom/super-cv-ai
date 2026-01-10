@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useEditorStore } from "../stores/useEditorStore";
 import { CvEditor } from "./CvEditor";
 import { RibbonBar } from "./RibbonBar";
@@ -10,17 +10,22 @@ import { Check, Sparkles, ArrowLeft, Cpu, FileText, Wand2, CheckCircle2, Zap } f
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import type { CvData, SectionType } from "../types/editor.types";
 
 export function EditorLayout() {
     const aiDraft = useEditorStore((s) => s.aiDraft);
     const cvData = useEditorStore((s) => s.cvData);
     const applySuggestion = useEditorStore((s) => s.applySuggestion);
+    const { id: cvId } = useParams<{ id: string }>();
 
     const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
     const [mobileTab, setMobileTab] = useState<"ai" | "preview">("preview");
+    const [lastAppliedSection, setLastAppliedSection] = useState<string | null>(null);
+    const [isPreviewMode, setIsPreviewMode] = useState(false);
 
     const printRef = useRef<HTMLDivElement>(null);
+    const initialTotalRef = useRef<number | null>(null);
 
     if (!aiDraft || !cvData) {
         return <EditorLoading />;
@@ -62,17 +67,36 @@ export function EditorLayout() {
             if (targetIndex !== -1) applySuggestion(type as keyof CvData, data, targetIndex);
         }
         setAppliedIds((prev) => new Set(prev).add(`${type}-${id}`));
+        // Set last applied section for animation feedback
+        setLastAppliedSection(type);
+        setTimeout(() => setLastAppliedSection(null), 1500);
     };
 
-    const missingSkills = (aiDraft.hard_skills || []).filter((s: string) => !(cvData.hard_skills || []).includes(s));
+    // Calculate initial total suggestions count ONCE based on aiDraft
+    // This ensures the denominator stays constant as suggestions are applied
 
-    const totalSuggestions =
-        (aiDraft.professional_summary !== cvData.professional_summary ? 1 : 0) +
-        (missingSkills.length > 0 ? 1 : 0) +
-        (aiDraft.work_experience || []).filter((aiExp, idx) => findBestMatchIndex(aiExp, cvData.work_experience || [], idx) !== -1).length;
+    if (initialTotalRef.current === null) {
+        const initialMissingSkills = (aiDraft.hard_skills || []).filter(
+            (s: string) => !(cvData.hard_skills || []).includes(s)
+        );
+        const workExpCount = (aiDraft.work_experience || []).filter(
+            (aiExp, idx) => findBestMatchIndex(aiExp, cvData.work_experience || [], idx) !== -1
+        ).length;
 
+        initialTotalRef.current =
+            (aiDraft.professional_summary !== cvData.professional_summary ? 1 : 0) +
+            (initialMissingSkills.length > 0 ? 1 : 0) +
+            workExpCount;
+    }
+
+    const totalSuggestions = initialTotalRef.current;
     const appliedCount = appliedIds.size;
     const progressPercent = totalSuggestions > 0 ? Math.min(100, (appliedCount / totalSuggestions) * 100) : 0;
+
+    // Current missing skills for display (can change as skills are applied)
+    const missingSkills = (aiDraft.hard_skills || []).filter(
+        (s: string) => !(cvData.hard_skills || []).includes(s)
+    );
 
     return (
         <div className="fixed inset-0 h-[100dvh] z-[100] bg-gradient-to-br from-slate-100 via-stone-50 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col md:flex-row overflow-hidden transition-colors">
@@ -105,8 +129,9 @@ export function EditorLayout() {
                             </div>
                         </div>
                         <Link
-                            href="/"
+                            href={`/cv/${cvId}/analyze`}
                             className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl text-slate-400 transition-colors"
+                            title="Back to Analysis"
                         >
                             <ArrowLeft size={18} />
                         </Link>
@@ -222,7 +247,7 @@ export function EditorLayout() {
             >
                 <div className="flex-1 w-full h-full overflow-y-auto custom-scrollbar flex flex-col items-center bg-[radial-gradient(circle_at_center,#e5e7eb_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,#334155_1px,transparent_1px)] [background-size:24px_24px] pb-40 md:pb-16">
                     <div className="w-full sticky top-0 z-40 p-4">
-                        <RibbonBar printRef={printRef} />
+                        <RibbonBar printRef={printRef} isPreviewMode={isPreviewMode} setIsPreviewMode={setIsPreviewMode} />
                     </div>
 
                     <motion.div
@@ -241,7 +266,7 @@ export function EditorLayout() {
                                 <div className="w-[210mm] min-h-[297mm] origin-top-left scale-[0.45] sm:scale-[0.55] md:scale-100 
                                                [&_*]:!text-slate-900 [&_h1]:!text-inherit [&_h2]:!text-inherit [&_h3]:!text-inherit 
                                                [&_.text-slate-500]:!text-slate-500 [&_.text-slate-600]:!text-slate-600 [&_.text-slate-700]:!text-slate-700">
-                                    <CvEditor printRef={printRef} />
+                                    <CvEditor printRef={printRef} highlightSection={lastAppliedSection} isPreviewMode={isPreviewMode} />
                                 </div>
                             </div>
                         </div>

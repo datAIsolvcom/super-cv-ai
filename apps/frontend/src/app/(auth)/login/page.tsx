@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, ArrowLeft, Sparkles } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,14 +98,24 @@ function LoginForm() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                className="w-full bg-[hsl(var(--surface-elevated))] border border-black/[0.06] dark:border-white/[0.08] rounded-xl p-4 text-[hsl(var(--text-primary))] placeholder:text-[hsl(var(--text-muted))] focus:border-[hsla(var(--accent-primary)/0.5)] focus:shadow-[0_0_20px_hsla(var(--accent-primary)/0.15)] outline-none transition-all duration-300"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  required
+                  className="w-full bg-[hsl(var(--surface-elevated))] border border-black/[0.06] dark:border-white/[0.08] rounded-xl p-4 pr-12 text-[hsl(var(--text-primary))] placeholder:text-[hsl(var(--text-muted))] focus:border-[hsla(var(--accent-primary)/0.5)] focus:shadow-[0_0_20px_hsla(var(--accent-primary)/0.15)] outline-none transition-all duration-300"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
 
               <RippleButton
                 type="submit"

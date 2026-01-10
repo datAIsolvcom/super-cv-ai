@@ -1,18 +1,22 @@
 "use client";
 
-import { RefObject } from "react";
+import { RefObject, useMemo } from "react";
 import { useEditorStore } from "../stores/useEditorStore";
 import type { SectionType, CvData } from "../types/editor.types";
 import { Mail, Phone, MapPin, Linkedin, Globe, GripVertical, Trash2, Plus } from "lucide-react";
 import { EditableField } from "./EditableField";
+import { ReadOnlyField } from "./ReadOnlyField";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CvEditorProps {
   printRef: RefObject<HTMLDivElement | null>;
+  highlightSection?: string | null;
+  isPreviewMode?: boolean;
 }
 
-export function CvEditor({ printRef }: CvEditorProps) {
+export function CvEditor({ printRef, highlightSection, isPreviewMode = false }: CvEditorProps) {
   const cvData = useEditorStore((s) => s.cvData);
   const design = useEditorStore((s) => s.design);
   const sectionOrder = useEditorStore((s) => s.sectionOrder);
@@ -46,66 +50,93 @@ export function CvEditor({ printRef }: CvEditorProps) {
     updateCvField(section, [templates[section], ...((cvData as unknown as Record<string, unknown[]>)[section] || [])]);
   };
 
+  // Field component memoized to prevent re-creation on render
+  const Field = useMemo(() => {
+    return ({ value, onSave, className, tagName = "div" as const, style }: {
+      value: string;
+      onSave: (val: string) => void;
+      className?: string;
+      tagName?: "h1" | "h2" | "h3" | "p" | "span" | "div";
+      style?: React.CSSProperties;
+    }) => {
+      if (isPreviewMode) {
+        return <ReadOnlyField value={value} className={className} tagName={tagName} style={style} />;
+      }
+      return <EditableField value={value} onSave={onSave} className={className} tagName={tagName} style={style} />;
+    };
+  }, [isPreviewMode]);
+
   const renderSection = (type: SectionType) => {
     const uiOnly = "print:hidden";
     const preventBreak = "print:break-inside-avoid";
     const keepWithNext = "print:break-after-avoid";
 
+    // Map section types to highlight keys
+    const highlightMap: Record<SectionType, string[]> = {
+      summary: ["professional_summary"],
+      skills: ["hard_skills"],
+      experience: ["work_experience"],
+      projects: ["projects"],
+      education: ["education"],
+    };
+
+    const isHighlighted = highlightSection && highlightMap[type]?.includes(highlightSection);
+    const highlightClass = isHighlighted
+      ? "ring-2 ring-amber-400 ring-offset-2 bg-amber-50/50 transition-all duration-500"
+      : "";
+
     switch (type) {
       case "summary":
         return cvData.professional_summary ? (
-          <div className={`group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent ${preventBreak}`}>
+          <div className={cn(`group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent ${preventBreak}`, highlightClass)}>
             <SectionHeader title="Professional Summary" design={design} className={keepWithNext} />
             <div className="text-justify">
-              <EditableField tagName="p" className={`text-slate-800 ${design.lineHeight}`} value={cvData.professional_summary} onSave={(val) => updateCvField("professional_summary", val)} />
+              <Field tagName="p" className={`text-slate-800 ${design.lineHeight}`} value={cvData.professional_summary} onSave={(val) => updateCvField("professional_summary", val)} />
             </div>
           </div>
         ) : null;
 
       case "skills":
         return (cvData.hard_skills || []).length > 0 ? (
-          <div className={`group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent ${preventBreak}`}>
+          <div className={cn(`group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent ${preventBreak}`, highlightClass)}>
             <SectionHeader title="Technical Skills" design={design} className={keepWithNext} />
             <div className="flex flex-wrap gap-2 justify-start">
               {(cvData.hard_skills || []).map((skill, i) => (
                 <span key={i} className="bg-slate-100 px-2 py-1 rounded font-semibold text-slate-700 flex items-center gap-1 group/skill border border-slate-200 print:bg-transparent print:border-none print:p-0">
-                  <EditableField tagName="span" value={skill} onSave={(val) => { const newSkills = [...(cvData.hard_skills || [])]; newSkills[i] = val; updateCvField("hard_skills", newSkills); }} />
-                  <button onClick={() => removeItem("hard_skills", i)} className={`hidden group-hover/skill:block text-red-500 hover:bg-red-100 rounded-full p-0.5 ${uiOnly}`}><Trash2 size={10} /></button>
+                  <Field tagName="span" value={skill} onSave={(val) => { const newSkills = [...(cvData.hard_skills || [])]; newSkills[i] = val; updateCvField("hard_skills", newSkills); }} />
+                  {!isPreviewMode && <button onClick={() => removeItem("hard_skills", i)} className={`hidden group-hover/skill:block text-red-500 hover:bg-red-100 rounded-full p-0.5 ${uiOnly}`}><Trash2 size={10} /></button>}
                 </span>
               ))}
-              <button onClick={() => updateCvField("hard_skills", [...(cvData.hard_skills || []), "New"])} className={`bg-blue-50 text-blue-500 px-2 py-1 rounded hover:bg-blue-100 transition-opacity font-medium ${uiOnly}`}>+ Add</button>
+              {!isPreviewMode && <button onClick={() => updateCvField("hard_skills", [...(cvData.hard_skills || []), "New"])} className={`bg-blue-50 text-blue-500 px-2 py-1 rounded hover:bg-blue-100 transition-opacity font-medium ${uiOnly}`}>+ Add</button>}
             </div>
           </div>
         ) : null;
 
       case "experience":
         return (cvData.work_experience || []).length > 0 ? (
-          <div className="group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent">
+          <div className={cn("group relative pl-4 hover:border-l-4 hover:border-blue-200 transition-all rounded p-2 hover:bg-slate-50 border-l-4 border-transparent", highlightClass)}>
             <div className={`flex justify-between items-center mb-2 border-b pb-1 ${keepWithNext}`} style={{ borderColor: design.accentColor }}>
               <h2 className="text-[0.9em] font-bold uppercase tracking-widest" style={{ color: design.accentColor }}>Work Experience</h2>
-              <button onClick={() => addItem("work_experience")} className={`opacity-0 group-hover:opacity-100 text-blue-500 hover:bg-blue-100 rounded p-1 ${uiOnly}`}><Plus size={16} /></button>
+              {!isPreviewMode && <button onClick={() => addItem("work_experience")} className={`opacity-0 group-hover:opacity-100 text-blue-500 hover:bg-blue-100 rounded p-1 ${uiOnly}`}><Plus size={16} /></button>}
             </div>
             <div className={cn("flex flex-col", design.sectionSpacing)}>
               {(cvData.work_experience || []).map((exp, i) => (
                 <div key={i} className={`group/item relative ${preventBreak}`}>
-                  <button onClick={() => removeItem("work_experience", i)} className={`absolute -right-6 top-0 opacity-0 group-hover/item:opacity-100 text-red-400 p-1 hover:bg-red-50 rounded transition-all ${uiOnly}`}><Trash2 size={14} /></button>
+                  {!isPreviewMode && <button onClick={() => removeItem("work_experience", i)} className={`absolute -right-6 top-0 opacity-0 group-hover/item:opacity-100 text-red-400 p-1 hover:bg-red-50 rounded transition-all ${uiOnly}`}><Trash2 size={14} /></button>}
                   <div className="flex justify-between items-baseline">
-                    <EditableField tagName="h3" className="font-bold text-[1.15em] text-slate-900 leading-tight" value={exp.title} onSave={(v) => updateCvField(`work_experience[${i}].title`, v)} />
-                    <EditableField tagName="span" className="text-[0.9em] font-medium text-slate-500 whitespace-nowrap ml-4" value={exp.dates} onSave={(v) => updateCvField(`work_experience[${i}].dates`, v)} />
+                    <Field tagName="h3" className="font-bold text-[1.15em] text-slate-900 leading-tight" value={exp.title} onSave={(v) => updateCvField(`work_experience[${i}].title`, v)} />
+                    <Field tagName="span" className="text-[0.9em] font-medium text-slate-500 whitespace-nowrap ml-4" value={exp.dates} onSave={(v) => updateCvField(`work_experience[${i}].dates`, v)} />
                   </div>
-                  <EditableField tagName="div" className="font-semibold mb-1" style={{ color: design.accentColor }} value={exp.company} onSave={(v) => updateCvField(`work_experience[${i}].company`, v)} />
-                  <div className="flex flex-col gap-0.5">
+                  <Field tagName="div" className="font-semibold mb-1" style={{ color: design.accentColor }} value={exp.company} onSave={(v) => updateCvField(`work_experience[${i}].company`, v)} />
+                  <ul className="list-disc pl-5 space-y-0.5" style={{ listStylePosition: 'outside' }}>
                     {(exp.achievements || []).map((bullet, idx) => (
-                      <div key={idx} className="flex items-start group/bullet relative">
-                        <span className="mt-[0.6em] mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-800" style={{ backgroundColor: '#1e293b', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} />
-                        <div className={`flex-1 text-slate-700 text-justify`}>
-                          <EditableField tagName="span" value={bullet} className="inline" onSave={(v) => { const newAch = [...exp.achievements]; newAch[idx] = v; updateCvField(`work_experience[${i}].achievements`, newAch); }} />
-                        </div>
-                        <button onClick={() => { const newAch = exp.achievements.filter((_, x) => x !== idx); updateCvField(`work_experience[${i}].achievements`, newAch); }} className={`opacity-0 group-hover/bullet:opacity-100 text-red-300 hover:text-red-500 ml-2 ${uiOnly}`}><Trash2 size={12} /></button>
-                      </div>
+                      <li key={idx} className="group/bullet text-slate-700 text-justify pl-1">
+                        <Field tagName="span" value={bullet} className="inline" onSave={(v) => { const newAch = [...exp.achievements]; newAch[idx] = v; updateCvField(`work_experience[${i}].achievements`, newAch); }} />
+                        {!isPreviewMode && <button onClick={() => { const newAch = exp.achievements.filter((_, x) => x !== idx); updateCvField(`work_experience[${i}].achievements`, newAch); }} className={`opacity-0 group-hover/bullet:opacity-100 text-red-300 hover:text-red-500 ml-2 ${uiOnly}`}><Trash2 size={12} /></button>}
+                      </li>
                     ))}
-                    <button onClick={() => updateCvField(`work_experience[${i}].achievements`, [...exp.achievements, "New achievement"])} className={`text-blue-400 hover:underline opacity-0 group-hover/item:opacity-100 font-medium text-left ml-4 mt-1 ${uiOnly}`}>+ Add bullet</button>
-                  </div>
+                  </ul>
+                  {!isPreviewMode && <button onClick={() => updateCvField(`work_experience[${i}].achievements`, [...exp.achievements, "New achievement"])} className={`text-blue-400 hover:underline opacity-0 group-hover/item:opacity-100 font-medium text-left ml-5 mt-1 ${uiOnly}`}>+ Add bullet</button>}
                 </div>
               ))}
             </div>
@@ -127,13 +158,13 @@ export function CvEditor({ printRef }: CvEditorProps) {
       className={cn("bg-white text-slate-900 w-full h-full", design.fontFamily, design.pageMargin, design.fontSize, design.lineHeight)}
     >
       <header className={`border-b-2 pb-4 mb-4 flex flex-col items-center text-center ${template === "minimal" ? "items-start text-left border-none" : ""}`} style={{ borderColor: design.accentColor }}>
-        <EditableField tagName="h1" className="text-[2.5em] font-bold uppercase tracking-wider mb-2 leading-none" style={{ color: design.accentColor || '#000000' }} value={cvData.full_name || "Name"} onSave={(v) => updateCvField("full_name", v)} />
+        <Field tagName="h1" className="text-[2.5em] font-bold uppercase tracking-wider mb-2 leading-none" style={{ color: design.accentColor || '#000000' }} value={cvData.full_name || "Name"} onSave={(v) => updateCvField("full_name", v)} />
         <div className={`flex flex-wrap gap-x-4 gap-y-1 text-[0.9em] text-slate-600 ${template === "minimal" ? "justify-start" : "justify-center"}`}>
-          {contact.email && <div className="flex items-center gap-1"><Mail size={14} /><EditableField tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
-          {contact.phone && <div className="flex items-center gap-1"><Phone size={14} /><EditableField tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
-          {contact.location && <div className="flex items-center gap-1"><MapPin size={14} /><EditableField tagName="span" value={contact.location} onSave={(v) => updateCvField("contact_info.location", v)} /></div>}
-          {contact.linkedin && <div className="flex items-center gap-1"><Linkedin size={14} /><EditableField tagName="span" value={contact.linkedin} onSave={(v) => updateCvField("contact_info.linkedin", v)} /></div>}
-          {contact.portfolio && <div className="flex items-center gap-1"><Globe size={14} /><EditableField tagName="span" value={contact.portfolio} onSave={(v) => updateCvField("contact_info.portfolio", v)} /></div>}
+          {contact.email && <div className="flex items-center gap-1"><Mail size={14} /><Field tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
+          {contact.phone && <div className="flex items-center gap-1"><Phone size={14} /><Field tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
+          {contact.location && <div className="flex items-center gap-1"><MapPin size={14} /><Field tagName="span" value={contact.location} onSave={(v) => updateCvField("contact_info.location", v)} /></div>}
+          {contact.linkedin && <div className="flex items-center gap-1"><Linkedin size={14} /><Field tagName="span" value={contact.linkedin} onSave={(v) => updateCvField("contact_info.linkedin", v)} /></div>}
+          {contact.portfolio && <div className="flex items-center gap-1"><Globe size={14} /><Field tagName="span" value={contact.portfolio} onSave={(v) => updateCvField("contact_info.portfolio", v)} /></div>}
         </div>
       </header>
 
@@ -142,10 +173,10 @@ export function CvEditor({ printRef }: CvEditorProps) {
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef} className={cn("flex flex-col", design.sectionSpacing)}>
               {sectionOrder.map((sectionKey, index) => (
-                <Draggable key={sectionKey} draggableId={sectionKey} index={index}>
+                <Draggable key={sectionKey} draggableId={sectionKey} index={index} isDragDisabled={isPreviewMode}>
                   {(provided, snapshot) => (
-                    <div ref={provided.innerRef} {...provided.draggableProps} className={cn("relative rounded-xl transition-all duration-200 group border-2 border-transparent", snapshot.isDragging ? "bg-white shadow-2xl scale-105 z-50 ring-2 ring-blue-500 opacity-90" : "print:block", "hover:border-slate-100 print:hover:border-transparent")}>
-                      <div {...provided.dragHandleProps} className="absolute -left-10 top-4 p-2 text-slate-300 hover:text-slate-600 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 rounded-md print:hidden" title="Drag section"><GripVertical size={20} /></div>
+                    <div ref={provided.innerRef} {...provided.draggableProps} className={cn("relative rounded-xl transition-all duration-200 group border-2 border-transparent", snapshot.isDragging ? "bg-white shadow-2xl scale-105 z-50 ring-2 ring-blue-500 opacity-90" : "print:block", !isPreviewMode && "hover:border-slate-100", "print:hover:border-transparent")}>
+                      {!isPreviewMode && <div {...provided.dragHandleProps} className="absolute -left-10 top-4 p-2 text-slate-300 hover:text-slate-600 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity bg-slate-100 rounded-md print:hidden" title="Drag section"><GripVertical size={20} /></div>}
                       {renderSection(sectionKey)}
                     </div>
                   )}
