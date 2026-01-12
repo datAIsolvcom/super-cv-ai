@@ -177,7 +177,7 @@ export function UploadSection() {
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 0.5, repeat: Infinity }}
-                className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.4)]"
+                className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(47,107,255,0.4)]"
               >
                 <span className="text-4xl font-bold text-white">{countdown}</span>
               </motion.div>
@@ -191,7 +191,7 @@ export function UploadSection() {
                     initial={{ width: '100%' }}
                     animate={{ width: '0%' }}
                     transition={{ duration: 3, ease: 'linear' }}
-                    className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] rounded-full"
                   />
                 </div>
                 <button
@@ -246,7 +246,7 @@ export function UploadSection() {
               className={cn(
                 "relative rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer flex flex-col items-center justify-center overflow-hidden group/zone",
                 isDragging
-                  ? "border-amber-500 bg-amber-500/10 scale-[1.02] shadow-[0_0_30px_rgba(245,158,11,0.2)]"
+                  ? "border-[#2F6BFF] bg-[#2F6BFF]/10 scale-[1.02] shadow-[0_0_30px_rgba(47,107,255,0.2)]"
                   : "border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/30",
                 file ? "border-emerald-500/50 bg-emerald-500/5 border-solid" : ""
               )}
@@ -279,7 +279,7 @@ export function UploadSection() {
                 ) : (
                   <motion.div key="upload-prompt" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center p-6">
                     <div className="w-20 h-20 mx-auto bg-slate-200 dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-6 group-hover/zone:scale-110 transition-transform duration-300 border border-slate-300 dark:border-white/5">
-                      <UploadCloud className={cn("transition-colors duration-300", isDragging ? "text-amber-500" : "text-slate-400 group-hover/zone:text-slate-600 dark:group-hover/zone:text-white")} size={32} />
+                      <UploadCloud className={cn("transition-colors duration-300", isDragging ? "text-[#2F6BFF]" : "text-slate-400 group-hover/zone:text-slate-600 dark:group-hover/zone:text-white")} size={32} />
                     </div>
                     <h3 className="text-slate-900 dark:text-white font-bold text-lg mb-2">Drop Resume Here</h3>
                     <p className="text-slate-500 dark:text-slate-400 text-sm px-4">Support PDF & DOCX. Max 10MB.</p>
@@ -313,8 +313,8 @@ export function UploadSection() {
                 disabled={isLoading || !file}
                 className="h-16 relative overflow-hidden rounded-xl font-bold text-lg transition-all duration-500
                            disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none group/btn
-                           bg-gradient-to-r from-amber-500 to-amber-600 text-slate-900
-                           hover:shadow-[0_0_60px_rgba(245,158,11,0.4)] hover:translate-y-[-2px] active:scale-[0.98]"
+                           bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white
+                           hover:shadow-[0_0_60px_rgba(47,107,255,0.4)] hover:translate-y-[-2px] active:scale-[0.98]"
                 style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">

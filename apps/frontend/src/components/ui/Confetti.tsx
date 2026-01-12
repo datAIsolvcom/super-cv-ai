@@ -14,12 +14,12 @@ interface Particle {
 }
 
 const COLORS = [
-    "#f59e0b", // amber
+    "#2F6BFF", // electric blue
     "#8b5cf6", // violet
     "#10b981", // emerald
     "#3b82f6", // blue
     "#ec4899", // pink
-    "#f97316", // orange
+    "#3CE0B1", // mint green
     "#06b6d4", // cyan
 ];
 

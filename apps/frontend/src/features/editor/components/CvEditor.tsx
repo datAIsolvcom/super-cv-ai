@@ -85,7 +85,7 @@ export function CvEditor({ printRef, highlightSection, isPreviewMode = false }: 
 
     const isHighlighted = highlightSection && highlightMap[type]?.includes(highlightSection);
     const highlightClass = isHighlighted
-      ? "ring-2 ring-amber-400 ring-offset-2 bg-amber-50/50 transition-all duration-500"
+      ? "ring-2 ring-[#2F6BFF] ring-offset-2 bg-[#2F6BFF]/10 transition-all duration-500"
       : "";
 
     switch (type) {

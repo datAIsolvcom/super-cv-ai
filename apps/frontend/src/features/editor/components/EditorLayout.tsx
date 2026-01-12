@@ -109,7 +109,7 @@ export function EditorLayout() {
                 )}
             >
                 <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/95 backdrop-blur-2xl" />
-                <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-amber-500/20 to-transparent" />
+                <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-[#2F6BFF]/20 to-transparent" />
 
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -143,7 +143,7 @@ export function EditorLayout() {
                                 <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                                     {appliedCount} of {totalSuggestions} applied
                                 </span>
-                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                                <span className="text-xs font-bold text-[#2F6BFF] dark:text-[#3CE0B1]">
                                     {Math.round(progressPercent)}%
                                 </span>
                             </div>
@@ -152,7 +152,7 @@ export function EditorLayout() {
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progressPercent}%` }}
                                     transition={{ duration: 0.5, ease: "easeOut" }}
-                                    className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full"
+                                    className="h-full bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] rounded-full"
                                 />
                             </div>
                         </div>
@@ -232,7 +232,7 @@ export function EditorLayout() {
 
                     {totalSuggestions === 0 && (
                         <div className="text-center py-12 opacity-60">
-                            <Zap size={32} className="mx-auto mb-3 text-amber-500" />
+                            <Zap size={32} className="mx-auto mb-3 text-[#2F6BFF]" />
                             <p className="text-slate-500 dark:text-slate-400">Your CV is looking great!</p>
                         </div>
                     )}
@@ -304,7 +304,7 @@ export function EditorLayout() {
                         className={cn(
                             "flex-1 py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all",
                             mobileTab === "preview"
-                                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25"
+                                ? "bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white shadow-lg shadow-[#2F6BFF]/25"
                                 : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
                         )}
                     >

@@ -66,7 +66,7 @@ export function RippleButton({
     const baseStyles = "relative overflow-hidden font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2";
 
     const variants = {
-        primary: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white shadow-lg shadow-amber-500/25 focus:ring-amber-500",
+        primary: "bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] hover:from-[#1E55F0] hover:to-[#3CE0B1] text-white shadow-lg shadow-[#2F6BFF]/25 focus:ring-[#2F6BFF]",
         secondary: "bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-900/20 focus:ring-slate-500 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900",
         ghost: "bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700",
     };

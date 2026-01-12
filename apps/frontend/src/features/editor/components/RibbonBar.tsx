@@ -116,7 +116,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       >
         <div className="relative glass-panel rounded-2xl p-2 flex flex-wrap items-center justify-center md:justify-between gap-2 shadow-xl">
           <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-            <div className="absolute top-0 left-1/4 w-32 h-32 bg-amber-400/10 rounded-full blur-3xl" />
+            <div className="absolute top-0 left-1/4 w-32 h-32 bg-[#2F6BFF]/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 right-1/4 w-24 h-24 bg-indigo-400/10 rounded-full blur-3xl" />
           </div>
 
@@ -129,7 +129,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all",
                   activeDropdown === "font"
-                    ? "bg-amber-500/20 text-amber-700 dark:text-amber-400 ring-1 ring-amber-500/30"
+                    ? "bg-[#2F6BFF]/20 text-[#2F6BFF] dark:text-[#3CE0B1] ring-1 ring-[#2F6BFF]/30"
                     : "hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
                 )}
               >
@@ -157,12 +157,12 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                             className={cn(
                               "w-full text-left px-3 py-2 rounded-lg text-sm flex justify-between items-center transition-colors",
                               design.fontFamily === f.key
-                                ? "bg-amber-500/20 text-amber-700 dark:text-amber-400 font-semibold"
+                                ? "bg-[#2F6BFF]/20 text-[#2F6BFF] dark:text-[#3CE0B1] font-semibold"
                                 : "hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
                             )}
                           >
                             {f.label}
-                            {design.fontFamily === f.key && <CheckCircle2 size={14} className="text-amber-500" />}
+                            {design.fontFamily === f.key && <CheckCircle2 size={14} className="text-[#2F6BFF]" />}
                           </button>
                         ))}
                       </div>
@@ -177,7 +177,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                             className={cn(
                               "flex-1 py-1.5 text-xs rounded-md font-medium transition-all",
                               design.fontSize === s.key
-                                ? "bg-white dark:bg-slate-800 shadow text-amber-600 dark:text-amber-400"
+                                ? "bg-white dark:bg-slate-800 shadow text-[#2F6BFF] dark:text-[#3CE0B1]"
                                 : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                             )}
                           >
@@ -227,7 +227,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                           onClick={() => { setDesign({ accentColor: c }); setActiveDropdown(null); }}
                           className={cn(
                             "w-8 h-8 rounded-full shadow-md transition-all",
-                            design.accentColor === c && "ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900"
+                            design.accentColor === c && "ring-2 ring-[#2F6BFF] ring-offset-2 ring-offset-white dark:ring-offset-slate-900"
                           )}
                           style={{ backgroundColor: c }}
                         />
@@ -246,7 +246,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all",
                   activeDropdown === "layout"
-                    ? "bg-amber-500/20 text-amber-700 dark:text-amber-400 ring-1 ring-amber-500/30"
+                    ? "bg-[#2F6BFF]/20 text-[#2F6BFF] dark:text-[#3CE0B1] ring-1 ring-[#2F6BFF]/30"
                     : "hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
                 )}
               >
@@ -268,7 +268,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                         <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5 block">Margin</label>
                         <div className="grid grid-cols-3 gap-1">
                           {margins.map((m) => (
-                            <button key={m.key} onClick={() => setDesign({ pageMargin: m.key })} className={cn("py-1.5 text-[10px] rounded-md font-medium transition-all", design.pageMargin === m.key ? "bg-amber-500 text-white shadow" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200")}>
+                            <button key={m.key} onClick={() => setDesign({ pageMargin: m.key })} className={cn("py-1.5 text-[10px] rounded-md font-medium transition-all", design.pageMargin === m.key ? "bg-[#2F6BFF] text-white shadow" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200")}>
                               {m.label}
                             </button>
                           ))}
@@ -278,7 +278,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                         <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5 block">Spacing</label>
                         <div className="grid grid-cols-4 gap-1">
                           {spacings.map((s) => (
-                            <button key={s.key} onClick={() => setDesign({ sectionSpacing: s.key })} className={cn("py-1.5 text-[10px] rounded-md font-medium transition-all", design.sectionSpacing === s.key ? "bg-amber-500 text-white shadow" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200")}>
+                            <button key={s.key} onClick={() => setDesign({ sectionSpacing: s.key })} className={cn("py-1.5 text-[10px] rounded-md font-medium transition-all", design.sectionSpacing === s.key ? "bg-[#2F6BFF] text-white shadow" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200")}>
                               {s.label}
                             </button>
                           ))}
@@ -288,7 +288,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                         <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1.5 block">Line Height</label>
                         <div className="grid grid-cols-3 gap-1">
                           {lineHeights.map((l) => (
-                            <button key={l.key} onClick={() => setDesign({ lineHeight: l.key })} className={cn("py-1.5 text-[10px] rounded-md font-medium transition-all", design.lineHeight === l.key ? "bg-amber-500 text-white shadow" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200")}>
+                            <button key={l.key} onClick={() => setDesign({ lineHeight: l.key })} className={cn("py-1.5 text-[10px] rounded-md font-medium transition-all", design.lineHeight === l.key ? "bg-[#2F6BFF] text-white shadow" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200")}>
                               {l.label}
                             </button>
                           ))}
@@ -310,7 +310,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                 className={cn(
                   "flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all",
                   activeDropdown === "template"
-                    ? "bg-amber-500/20 text-amber-700 dark:text-amber-400 ring-1 ring-amber-500/30"
+                    ? "bg-[#2F6BFF]/20 text-[#2F6BFF] dark:text-[#3CE0B1] ring-1 ring-[#2F6BFF]/30"
                     : "hover:bg-black/5 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
                 )}
               >
@@ -341,7 +341,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                           className={cn(
                             "w-full text-left p-3 rounded-xl flex items-center gap-3 transition-all border-2",
                             template === t.key
-                              ? "bg-amber-50 dark:bg-amber-500/10 border-amber-400 dark:border-amber-500/50"
+                              ? "bg-[#2F6BFF]/10 dark:bg-[#2F6BFF]/10 border-[#2F6BFF] dark:border-[#2F6BFF]/50"
                               : "border-transparent hover:bg-slate-50 dark:hover:bg-white/5"
                           )}
                         >
@@ -351,7 +351,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                           <div className="flex-1">
                             <div className="font-semibold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                               {t.label}
-                              {template === t.key && <CheckCircle2 size={12} className="text-amber-500" />}
+                              {template === t.key && <CheckCircle2 size={12} className="text-[#2F6BFF]" />}
                             </div>
                             <div className="text-xs text-slate-500 dark:text-slate-400">{t.description}</div>
                           </div>
@@ -385,7 +385,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
               whileHover={{ scale: 1.03, y: -1 }}
               whileTap={{ scale: 0.97 }}
               onClick={onSavePdfClick}
-              className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-amber-500/25 transition-all ml-2"
+              className="bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] hover:from-[#1E55F0] hover:to-[#3CE0B1] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-[#2F6BFF]/25 transition-all ml-2"
             >
               <FileDown size={16} />
               <span className="hidden md:inline">Save PDF</span>
@@ -416,21 +416,21 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
               </h3>
               <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300 mb-6">
                 <p className="font-medium text-slate-800 dark:text-slate-100">For best results, configure these settings:</p>
-                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg p-3 space-y-2">
+                <div className="bg-[#2F6BFF]/10 dark:bg-[#2F6BFF]/20 border border-[#2F6BFF]/20 dark:border-[#2F6BFF]/30 rounded-lg p-3 space-y-2">
                   <div className="flex items-start gap-2">
-                    <span className="text-amber-600 font-bold">1.</span>
+                    <span className="text-[#2F6BFF] font-bold">1.</span>
                     <span>Destination: <strong>"Save as PDF"</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-amber-600 font-bold">2.</span>
+                    <span className="text-[#2F6BFF] font-bold">2.</span>
                     <span>Margins: <strong>"None"</strong> or <strong>"Minimum"</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-amber-600 font-bold">3.</span>
+                    <span className="text-[#2F6BFF] font-bold">3.</span>
                     <span>Headers & Footers: <strong>Uncheck ☐</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-amber-600 font-bold">4.</span>
+                    <span className="text-[#2F6BFF] font-bold">4.</span>
                     <span>Background graphics: <strong>Check ☑</strong></span>
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                 </button>
                 <button
                   onClick={onConfirmPrint}
-                  className="flex-1 py-2 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 text-white font-bold transition-colors"
+                  className="flex-1 py-2 px-4 rounded-xl bg-[#2F6BFF] hover:bg-[#1E55F0] text-white font-bold transition-colors"
                 >
                   Continue to Print
                 </button>

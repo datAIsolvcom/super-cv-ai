@@ -10,7 +10,7 @@ interface CreditsCardProps {
 export function CreditsCard({ credits }: CreditsCardProps) {
     const getCreditsColor = () => {
         if (credits >= 3) return "from-emerald-500 to-teal-500";
-        if (credits >= 1) return "from-amber-500 to-orange-500";
+        if (credits >= 1) return "from-[#2F6BFF] to-[#3CE0B1]";
         return "from-red-500 to-pink-500";
     };
 
@@ -23,7 +23,7 @@ export function CreditsCard({ credits }: CreditsCardProps) {
         >
             <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-4">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Coins size={18} className="text-amber-500 shrink-0" />
+                    <Coins size={18} className="text-[#2F6BFF] shrink-0" />
                     <span>Credits</span>
                 </h3>
                 <div className={`self-start xs:self-auto px-2 sm:px-3 py-1 rounded-full bg-gradient-to-r ${getCreditsColor()} text-white text-xs sm:text-sm font-bold`}>
@@ -47,7 +47,7 @@ export function CreditsCard({ credits }: CreditsCardProps) {
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                 {credits > 0 ? (
                     <span className="flex items-start gap-1">
-                        <Sparkles size={14} className="text-amber-500 shrink-0 mt-0.5" />
+                        <Sparkles size={14} className="text-[#2F6BFF] shrink-0 mt-0.5" />
                         <span>Each credit = 1 CV analysis</span>
                     </span>
                 ) : (

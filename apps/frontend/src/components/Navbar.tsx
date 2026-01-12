@@ -52,11 +52,11 @@ export function Navbar() {
           >
 
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-300 to-amber-500 dark:from-amber-400 dark:to-amber-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <Sparkles size={18} fill="currentColor" className="text-slate-900" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <Sparkles size={18} fill="currentColor" className="text-white" />
               </div>
               <span className="font-serif font-bold text-xl tracking-tight text-slate-900 dark:text-white">
-                Super<span className="text-amber-600 dark:text-amber-400">CV</span>
+                Super<span className="text-[#2F6BFF] dark:text-[#3CE0B1]">CV</span>
               </span>
             </Link>
 
@@ -78,7 +78,7 @@ export function Navbar() {
                 {mode === 'auto' ? (
                   <Monitor size={18} className="text-indigo-500" />
                 ) : resolvedTheme === 'dark' ? (
-                  <Sun size={18} className="text-amber-500" />
+                  <Sun size={18} className="text-[#FFD84D]" />
                 ) : (
                   <Moon size={18} className="text-slate-700" />
                 )}
@@ -97,7 +97,7 @@ export function Navbar() {
                         {userName?.split(" ")[0]}
                       </p>
                     </div>
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-transparent group-hover:border-amber-500 transition-all">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-transparent group-hover:border-[#2F6BFF] transition-all">
                       {avatarUrl ? (
                         <img
                           src={avatarUrl}
@@ -137,7 +137,7 @@ export function Navbar() {
                 {mode === 'auto' ? (
                   <Monitor size={16} className="text-indigo-500" />
                 ) : resolvedTheme === 'dark' ? (
-                  <Sun size={16} className="text-amber-500" />
+                  <Sun size={16} className="text-[#FFD84D]" />
                 ) : (
                   <Moon size={16} className="text-slate-700" />
                 )}
@@ -145,7 +145,7 @@ export function Navbar() {
 
               {/* Mobile profile avatar */}
               {session && (
-                <Link href="/profile" className="w-8 h-8 rounded-full overflow-hidden border-2 border-transparent hover:border-amber-500 transition-all">
+                <Link href="/profile" className="w-8 h-8 rounded-full overflow-hidden border-2 border-transparent hover:border-[#2F6BFF] transition-all">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}
@@ -221,14 +221,14 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
       className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors relative group"
     >
       {children}
-      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-500 transition-all group-hover:w-full duration-300" />
+      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#2F6BFF] transition-all group-hover:w-full duration-300" />
     </Link>
   );
 }
 
 function MobileLink({ href, onClick, children }: { href: string; onClick: () => void; children: React.ReactNode }) {
   return (
-    <Link href={href} onClick={onClick} className="text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+    <Link href={href} onClick={onClick} className="text-slate-600 dark:text-slate-400 hover:text-[#2F6BFF] dark:hover:text-[#3CE0B1] transition-colors">
       {children}
     </Link>
   );

@@ -19,7 +19,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-8 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/20">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#2F6BFF]/20">
                 <Crown size={40} className="text-white" fill="currentColor" />
               </div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Credits Exhausted</h2>
@@ -29,7 +29,7 @@ export function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
               <div className="space-y-3">
                 <button
                   onClick={() => window.location.href = '/pricing'}
-                  className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg"
+                  className="w-full py-3.5 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white font-bold rounded-xl hover:scale-[1.02] transition-transform shadow-lg"
                 >
                   Upgrade Now ($9/mo)
                 </button>

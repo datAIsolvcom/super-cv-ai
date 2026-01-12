@@ -24,7 +24,7 @@ export function SuggestionCard({ title, badge, content, onApply }: SuggestionCar
     const getBadgeStyle = (badge?: string) => {
         switch (badge?.toLowerCase()) {
             case "high impact":
-                return "from-amber-500 to-orange-500 text-white";
+                return "from-[#2F6BFF] to-[#3CE0B1] text-white";
             case "skills":
                 return "from-emerald-500 to-teal-500 text-white";
             case "experience":
@@ -48,7 +48,7 @@ export function SuggestionCard({ title, badge, content, onApply }: SuggestionCar
             <motion.div
                 className={cn(
                     "absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-md",
-                    badge === "High Impact" && "bg-gradient-to-r from-amber-400/40 to-orange-400/40",
+                    badge === "High Impact" && "bg-gradient-to-r from-[#2F6BFF]/40 to-[#3CE0B1]/40",
                     badge === "Skills" && "bg-gradient-to-r from-emerald-400/40 to-teal-400/40",
                     badge === "Experience" && "bg-gradient-to-r from-indigo-400/40 to-purple-400/40",
                     !badge && "bg-gradient-to-r from-slate-400/20 to-slate-400/20"
@@ -56,7 +56,7 @@ export function SuggestionCard({ title, badge, content, onApply }: SuggestionCar
             />
 
             <div className="relative glass-panel p-5 rounded-2xl overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-500/5 to-transparent rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#2F6BFF]/5 to-transparent rounded-full pointer-events-none" />
 
                 <div className="flex justify-between items-start gap-3 mb-4">
                     <div className="flex-1 min-w-0">
@@ -116,7 +116,7 @@ export function SuggestionCard({ title, badge, content, onApply }: SuggestionCar
                 <motion.div
                     initial={{ opacity: 0.8 }}
                     animate={{ opacity: isHovering ? 1 : 0.8 }}
-                    className="text-xs text-slate-600 dark:text-slate-400 pl-3 border-l-2 border-amber-500/30 leading-relaxed"
+                    className="text-xs text-slate-600 dark:text-slate-400 pl-3 border-l-2 border-[#2F6BFF]/30 leading-relaxed"
                 >
                     {content}
                 </motion.div>

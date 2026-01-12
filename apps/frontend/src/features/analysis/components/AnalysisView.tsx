@@ -102,7 +102,7 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                     <motion.div
                         animate={{ scale: [1, 1.1, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-600 rounded-full flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(245,158,11,0.4)]"
+                        className="w-20 h-20 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(47,107,255,0.4)]"
                     >
                         <Loader2 size={40} className="text-white animate-spin" />
                     </motion.div>
@@ -147,7 +147,7 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                         <motion.div
                             animate={{ scale: [1, 1.1, 1] }}
                             transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                            className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-600 rounded-full flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(245,158,11,0.4)]"
+                            className="w-20 h-20 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(47,107,255,0.4)]"
                         >
                             <Loader2 size={40} className="text-white animate-spin" />
                         </motion.div>
@@ -214,13 +214,13 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                         </div>
                     </div>
 
-                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-panel p-10 md:p-14 rounded-[40px] shadow-2xl border border-amber-500/20 max-w-lg w-full relative z-10">
-                        <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-8 text-white shadow-[0_0_40px_rgba(245,158,11,0.4)]">
+                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="glass-panel p-10 md:p-14 rounded-[40px] shadow-2xl border border-[#2F6BFF]/20 max-w-lg w-full relative z-10">
+                        <div className="w-24 h-24 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center mx-auto mb-8 text-white shadow-[0_0_40px_rgba(47,107,255,0.4)]">
                             <Lock size={40} />
                         </div>
                         <h2 className="text-4xl font-serif font-bold text-slate-900 dark:text-white mb-3">Analysis Complete</h2>
                         <p className="text-slate-500 dark:text-slate-400 mb-10 text-lg">
-                            Your CV scored <span className="text-amber-600 dark:text-amber-400 font-bold text-xl">{analysisResult.overall_score}/100</span>.
+                            Your CV scored <span className="text-[#2F6BFF] dark:text-[#3CE0B1] font-bold text-xl">{analysisResult.overall_score}/100</span>.
                             <br /> Unlock to reveal the strategy to improve it.
                         </p>
                         <button
@@ -232,7 +232,7 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                                 {claimMutation.isPending ? (
                                     <Loader2 className="animate-spin text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
                                 ) : (
-                                    <Unlock className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
+                                    <Unlock className="text-[#2F6BFF] w-5 h-5 sm:w-6 sm:h-6" />
                                 )}
                                 <span>{session ? "Unlock Report (1 Credit)" : "Sign In to Unlock"}</span>
                             </span>
@@ -244,11 +244,11 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                 <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6 px-4">
                     <div className="grid lg:grid-cols-3 gap-6">
                         <motion.div variants={itemVariants} className="lg:col-span-2 glass-panel rounded-[32px] p-8 md:p-12 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
+                            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#2F6BFF]/10 rounded-full blur-[100px] pointer-events-none" />
 
                             <div className="flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
                                 <div className="flex-1 space-y-6 text-center md:text-left">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-widest">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#2F6BFF]/10 border border-[#2F6BFF]/20 text-[#2F6BFF] dark:text-[#3CE0B1] text-xs font-bold uppercase tracking-widest">
                                         <Sparkles size={12} /> Analysis Report
                                     </div>
                                     <h2 className="text-4xl md:text-6xl font-serif font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
@@ -259,7 +259,7 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                                     </p>
                                     <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
                                         <button onClick={() => handleCustomize("analysis")} disabled={customizeMutation.isPending} className="px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-950 font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-amber-50 transition-colors shadow-lg flex items-center gap-2">
-                                            {customizeMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} className="text-amber-500" />}
+                                            {customizeMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} className="text-[#3CE0B1]" />}
                                             Fix Issues with AI
                                         </button>
                                         <button onClick={() => router.push("/")} className="px-6 py-3 bg-transparent border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
@@ -295,8 +295,8 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                                         />
                                         <defs>
                                             <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#FCD34D" />
-                                                <stop offset="100%" stopColor="#F59E0B" />
+                                                <stop offset="0%" stopColor="#2F6BFF" />
+                                                <stop offset="100%" stopColor="#3CE0B1" />
                                             </linearGradient>
                                         </defs>
                                     </svg>
@@ -304,7 +304,7 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                                         <span className="text-6xl font-bold text-slate-900 dark:text-white tracking-tighter">
                                             <AnimatedCounter value={analysisResult.overall_score} />
                                         </span>
-                                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest mt-1">Overall</span>
+                                        <span className="text-xs font-bold text-[#2F6BFF] dark:text-[#3CE0B1] uppercase tracking-widest mt-1">Overall</span>
                                     </div>
                                 </div>
                             </div>

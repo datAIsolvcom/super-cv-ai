@@ -11,7 +11,7 @@ interface CvHistoryListProps {
 }
 
 const statusConfig = {
-    PENDING: { icon: Clock, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-500/10", label: "Pending", animate: false },
+    PENDING: { icon: Clock, color: "text-[#FFD84D]", bg: "bg-[#FFD84D]/10 dark:bg-[#FFD84D]/10", label: "Pending", animate: false },
     PROCESSING: { icon: Loader2, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10", label: "Processing", animate: true },
     COMPLETED: { icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10", label: "Completed", animate: false },
     FAILED: { icon: AlertCircle, color: "text-red-500", bg: "bg-red-50 dark:bg-red-500/10", label: "Failed", animate: false },

@@ -33,35 +33,61 @@ const config: Config = {
           950: "#020617",
         },
 
-        // Primary (Champagne Gold)
+        // Primary (Electric Blue)
         primary: {
-          DEFAULT: "#f59e0b",   // amber-500
-          50: "#fffbeb",
-          100: "#fef3c7",
-          200: "#fde68a",
-          300: "#fcd34d",
-          400: "#fbbf24",
-          500: "#f59e0b",
-          600: "#d97706",
-          700: "#b45309",
-          800: "#92400e",
-          900: "#78350f",
+          DEFAULT: "#2F6BFF",
+          50: "#EEF3FF",
+          100: "#E0EAFF",
+          200: "#C7D7FE",
+          300: "#A4BCFD",
+          400: "#8098FA",
+          500: "#2F6BFF",
+          600: "#1E55F0",
+          700: "#1642DD",
+          800: "#1838B3",
+          900: "#19338D",
         },
 
-        // Champagne (legacy support)
-        champagne: {
-          100: "#fef3c7",
-          300: "#fcd34d",
-          400: "#fbbf24",
-          500: "#f59e0b",
-          700: "#b45309",
+        // Secondary (Optimistic Yellow)
+        secondary: {
+          DEFAULT: "#FFD84D",
+          50: "#FFFBEB",
+          100: "#FEF3C7",
+          200: "#FDE68A",
+          300: "#FFD84D",
+          400: "#FBBF24",
+          500: "#F59E0B",
+          600: "#D97706",
+          700: "#B45309",
+          800: "#92400E",
+          900: "#78350F",
+        },
+
+        // Accent (Mint Green)
+        accent: {
+          DEFAULT: "#3CE0B1",
+          50: "#ECFDF5",
+          100: "#D1FAE5",
+          200: "#A7F3D0",
+          300: "#6EE7B7",
+          400: "#3CE0B1",
+          500: "#10B981",
+          600: "#059669",
+          700: "#047857",
+          800: "#065F46",
+          900: "#064E3B",
         },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "glass-gradient":
           "linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)",
-        "gold-gradient": "linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%)",
+        "gradient-primary": "linear-gradient(135deg, #2F6BFF 0%, #3CE0B1 100%)",
+        "gradient-secondary": "linear-gradient(135deg, #FFD84D 0%, #3CE0B1 100%)",
+        "gradient-accent": "linear-gradient(135deg, #2F6BFF 0%, #FFD84D 100%)",
+        "gradient-mesh": `radial-gradient(at 40% 20%, rgba(47, 107, 255, 0.15) 0px, transparent 50%),
+          radial-gradient(at 80% 0%, rgba(60, 224, 177, 0.12) 0px, transparent 50%),
+          radial-gradient(at 0% 50%, rgba(255, 216, 77, 0.1) 0px, transparent 50%)`,
       },
       animation: {
         float: "float 6s ease-in-out infinite",

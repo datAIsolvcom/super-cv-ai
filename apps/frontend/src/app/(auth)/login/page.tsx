@@ -80,8 +80,8 @@ function LoginForm() {
             </Link>
 
             <div className="text-center mb-8">
-              <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-[0_0_40px_hsla(var(--accent-primary)/0.3)]">
-                <Sparkles size={24} className="text-slate-900" />
+              <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-2xl flex items-center justify-center shadow-[0_0_40px_hsla(var(--accent-primary)/0.3)]">
+                <Sparkles size={24} className="text-white" />
               </div>
               <h1 className="text-2xl font-serif font-bold text-[hsl(var(--text-primary))] mb-2">
                 Welcome Back
