@@ -1,7 +1,7 @@
 "use client";
 
 import { UploadSection } from "@/features/dashboard/components/UploadSection";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
     Sparkles,
     Upload,
@@ -10,11 +10,7 @@ import {
     FileText,
     Clock,
     TrendingUp,
-    MessageCircle,
-    X,
-    Send,
-    ChevronRight,
-    Loader2
+    ChevronRight
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -52,142 +48,6 @@ function getGreeting() {
     if (hour < 12) return "Good morning";
     if (hour < 17) return "Good afternoon";
     return "Good evening";
-}
-
-// Career Coach Widget Component
-function CareerCoachWidget() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [message, setMessage] = useState("");
-
-    const quickPrompts = [
-        "How do I improve my ATS score?",
-        "What skills should I highlight?",
-        "Review my work experience section",
-    ];
-
-    return (
-        <>
-            {/* Floating Button */}
-            <motion.button
-                onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-6 right-6 z-50"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-            >
-                <div className="relative">
-                    {/* Glow effect */}
-                    <motion.div
-                        animate={{
-                            scale: [1, 1.2, 1],
-                            opacity: [0.4, 0.6, 0.4],
-                        }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="absolute -inset-2 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] rounded-full blur-lg"
-                    />
-
-                    <div className="relative w-14 h-14 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center shadow-xl">
-                        {isOpen ? (
-                            <X size={24} className="text-white" />
-                        ) : (
-                            <MessageCircle size={24} className="text-white" />
-                        )}
-                    </div>
-
-                    {/* Pulse indicator */}
-                    {!isOpen && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#3CE0B1] rounded-full border-2 border-white animate-pulse" />
-                    )}
-                </div>
-            </motion.button>
-
-            {/* Chat Widget */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        className="fixed bottom-24 right-6 z-50 w-80 md:w-96"
-                    >
-                        <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden">
-                            {/* Header */}
-                            <div className="bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] p-4">
-                                <div className="flex items-center gap-3">
-                                    <motion.div
-                                        animate={{ rotate: [0, 10, -10, 0] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                        className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"
-                                    >
-                                        <Sparkles size={20} className="text-white" />
-                                    </motion.div>
-                                    <div>
-                                        <h3 className="font-bold text-white">Career Coach</h3>
-                                        <p className="text-xs text-white/80">AI-powered career advice</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Chat Body */}
-                            <div className="p-4 h-64 overflow-y-auto bg-slate-50/50">
-                                {/* Welcome message with typing animation */}
-                                <div className="flex gap-3 mb-4">
-                                    <div className="w-8 h-8 bg-gradient-to-br from-[#2F6BFF] to-[#3CE0B1] rounded-full flex items-center justify-center shrink-0">
-                                        <Sparkles size={14} className="text-white" />
-                                    </div>
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="bg-white rounded-2xl rounded-tl-none p-3 shadow-sm max-w-[80%]"
-                                    >
-                                        <p className="text-sm text-slate-700">
-                                            Hi! I'm your AI Career Coach. How can I help you today?
-                                        </p>
-                                    </motion.div>
-                                </div>
-
-                                {/* Quick prompts */}
-                                <div className="space-y-2">
-                                    <p className="text-xs text-slate-500 mb-2">Quick questions:</p>
-                                    {quickPrompts.map((prompt, i) => (
-                                        <motion.button
-                                            key={i}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.1 + i * 0.1 }}
-                                            onClick={() => setMessage(prompt)}
-                                            className="block w-full text-left text-sm px-3 py-2 bg-white rounded-xl border border-slate-100 text-slate-600 hover:border-[#2F6BFF] hover:text-[#2F6BFF] hover:shadow-md transition-all"
-                                        >
-                                            {prompt}
-                                        </motion.button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Input */}
-                            <div className="p-4 border-t border-slate-100 bg-white">
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="Ask me anything..."
-                                        className="flex-1 px-4 py-2 bg-slate-50 rounded-xl text-sm border border-slate-100 focus:border-[#2F6BFF] focus:outline-none transition-colors"
-                                    />
-                                    <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        className="w-10 h-10 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] rounded-xl flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-shadow"
-                                    >
-                                        <Send size={16} />
-                                    </motion.button>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </>
-    );
 }
 
 // Animated Score Ring component
@@ -550,9 +410,6 @@ export default function AppHome() {
                     </motion.div>
                 </div>
             </div>
-
-            {/* Career Coach Widget */}
-            <CareerCoachWidget />
         </div>
     );
 }
