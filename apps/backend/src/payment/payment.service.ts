@@ -32,7 +32,6 @@ export class PaymentService {
             throw new BadRequestException('Invalid package selected');
         }
 
-        // Create pending transaction
         const transaction = await this.prisma.creditTransaction.create({
             data: {
                 userId,
@@ -42,18 +41,16 @@ export class PaymentService {
             },
         });
 
-        // Create Mayar payment link
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
         const redirectUrl = dto.redirectUrl || `${frontendUrl}/profile?payment=success&txn=${transaction.id}`;
-
         const expiredAt = new Date();
-        expiredAt.setHours(expiredAt.getHours() + 24); // 24 hour expiry
+        expiredAt.setHours(expiredAt.getHours() + 24);
 
         const requestBody = {
             name: user.name || user.email.split('@')[0],
             email: user.email,
             amount: pkg.priceIdr,
-            mobile: '08123456789', // Placeholder, Mayar requires a mobile number
+            mobile: '08123456789',
             redirectURL: redirectUrl,
             description: `SuperCV Credits - ${pkg.credits} credit(s) - TXN:${transaction.id}`,
             expiredAt: expiredAt.toISOString(),
@@ -78,7 +75,6 @@ export class PaymentService {
             throw new BadRequestException(`Payment failed: ${result.message || result.messages || 'Unknown error'}`);
         }
 
-        // Update transaction with Mayar payment ID
         await this.prisma.creditTransaction.update({
             where: { id: transaction.id },
             data: { mayarPaymentId: result.data.id },
@@ -93,7 +89,6 @@ export class PaymentService {
     }
 
     async handleWebhook(payload: any, signature?: string) {
-        // Verify webhook signature if token is provided
         if (this.mayarWebhookToken && signature) {
             const expectedSignature = crypto
                 .createHmac('sha256', this.mayarWebhookToken)
@@ -108,17 +103,13 @@ export class PaymentService {
 
         this.logger.log(`Webhook received: ${payload.event} - ${payload.id}`);
 
-        // Handle payment.success event
         if (payload.event === 'payment.success' || payload.status === 'success') {
             const mayarPaymentId = payload.id;
-
-            // Find transaction by Mayar payment ID
             const transaction = await this.prisma.creditTransaction.findUnique({
                 where: { mayarPaymentId },
             });
 
             if (!transaction) {
-                // Try to find from metadata
                 const metadata = payload.metadata;
                 if (metadata?.transactionId) {
                     return this.processPaymentSuccess(metadata.transactionId);
@@ -146,7 +137,6 @@ export class PaymentService {
             return { status: 'already_processed' };
         }
 
-        // Update transaction and add credits in a transaction
         await this.prisma.$transaction([
             this.prisma.creditTransaction.update({
                 where: { id: transactionId },
@@ -158,9 +148,7 @@ export class PaymentService {
             }),
         ]);
 
-        this.logger.log(
-            `Payment success: Added ${transaction.amount} credits to user ${transaction.userId}`,
-        );
+        this.logger.log(`Payment success: Added ${transaction.amount} credits to user ${transaction.userId}`);
 
         return { status: 'success', creditsAdded: transaction.amount };
     }

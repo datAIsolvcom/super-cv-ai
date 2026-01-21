@@ -44,11 +44,6 @@ const creditPackages = [
     },
 ];
 
-/**
- * Pricing Component
- * 
- * Credit-based pricing section with Mayar payment integration.
- */
 export function Pricing() {
     const containerRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(containerRef, { once: true, margin: '-100px' });

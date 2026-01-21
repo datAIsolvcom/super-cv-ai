@@ -7,11 +7,6 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-
 import { Sparkles, Menu, X, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-/**
- * LandingNavbar Component
- * 
- * Clean glassmorphism navbar.
- */
 export function LandingNavbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
