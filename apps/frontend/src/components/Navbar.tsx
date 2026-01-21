@@ -4,16 +4,14 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sparkles, LogOut, Moon, Sun, Monitor, User } from "lucide-react";
+import { Menu, X, Sparkles, LogOut, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTheme } from "@/hooks/useTheme";
+
 import { useProfileQuery } from "@/features/profile/api/useProfile";
 
 export function Navbar() {
   const { data: session } = useSession();
-  const mode = useTheme((s) => s.mode);
-  const resolvedTheme = useTheme((s) => s.resolvedTheme);
-  const toggleTheme = useTheme((s) => s.toggleTheme);
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -80,20 +78,7 @@ export function Navbar() {
 
 
               <div className="hidden md:flex items-center gap-4">
-                <button
-                  onClick={toggleTheme}
-                  className="p-2.5 rounded-full glass-button transition-all duration-500"
-                  aria-label="Toggle theme"
-                  title={mode === 'auto' ? 'Auto (System)' : mode === 'dark' ? 'Dark Mode' : 'Light Mode'}
-                >
-                  {mode === 'auto' ? (
-                    <Monitor size={18} className="text-indigo-500" />
-                  ) : resolvedTheme === 'dark' ? (
-                    <Sun size={18} className="text-[#FFD84D]" />
-                  ) : (
-                    <Moon size={18} className="text-slate-700" />
-                  )}
-                </button>
+
 
                 {session ? (
                   <div className="flex items-center gap-3 pl-4 border-l border-black/10 dark:border-white/10">
@@ -140,19 +125,7 @@ export function Navbar() {
 
               {/* Mobile header - show profile avatar + hamburger */}
               <div className="md:hidden flex items-center gap-2">
-                <button
-                  onClick={toggleTheme}
-                  className="p-2 rounded-full glass-button transition-all duration-300"
-                  aria-label="Toggle theme"
-                >
-                  {mode === 'auto' ? (
-                    <Monitor size={16} className="text-indigo-500" />
-                  ) : resolvedTheme === 'dark' ? (
-                    <Sun size={16} className="text-[#FFD84D]" />
-                  ) : (
-                    <Moon size={16} className="text-slate-700" />
-                  )}
-                </button>
+
 
                 {/* Mobile profile avatar */}
                 {session && (

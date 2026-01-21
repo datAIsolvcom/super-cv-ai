@@ -106,10 +106,10 @@ function migrateOldTheme(): { mode: ThemeMode; colorScheme: ColorScheme } | null
 export const useTheme = create<ThemeStore>()(
     persist(
         (set, get) => ({
-            mode: 'dark',
-            resolvedTheme: 'dark',
+            mode: 'light',
+            resolvedTheme: 'light',
             colorScheme: 'warm',
-            systemPreference: 'dark',
+            systemPreference: 'light',
 
             setMode: (mode) => {
                 const { systemPreference, colorScheme } = get()
@@ -161,19 +161,16 @@ export const useTheme = create<ThemeStore>()(
         }),
         {
             name: 'supercv-theme',
-            version: 2,
+            version: 3,
             migrate: (persistedState, version) => {
-                if (version === 1 || version === 0) {
-                    // Migrate from old format
-                    const migrated = migrateOldTheme()
-                    if (migrated) {
-                        return {
-                            mode: migrated.mode,
-                            resolvedTheme: migrated.mode,
-                            colorScheme: migrated.colorScheme,
-                            systemPreference: 'dark',
-                        }
-                    }
+                // Force migration to light mode for version 3 (removing dark mode feature)
+                if (version < 3) {
+                    return {
+                        mode: 'light',
+                        resolvedTheme: 'light',
+                        colorScheme: 'warm',
+                        systemPreference: 'light',
+                    } as ThemeStore
                 }
                 return persistedState as ThemeStore
             },
