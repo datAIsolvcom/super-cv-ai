@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { UpgradeModal } from "@/components/design-system/UpgradeModal";
+import { AuthRequiredModal } from "@/components/design-system/AuthRequiredModal";
 import { useAnalyzeMutation } from "@/features/analysis/api/useAnalysis";
 
 // File validation constants
@@ -68,6 +69,7 @@ export function UploadSection() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -111,7 +113,7 @@ export function UploadSection() {
       },
       {
         onSuccess: (data) => {
-          router.push(`/cv/${data.cvId}/analyze`);
+          router.push(`/cv/${data.cvId}/analyze?origin=new`);
         },
         onError: (error) => {
           toast.error(error.message || "Analysis failed. Please try again.");
@@ -125,6 +127,12 @@ export function UploadSection() {
 
   const handleAnalyze = () => {
     if (!file || analyzeMutation.isPending) return;
+
+    // Enforce authentication
+    if (!session?.user) {
+      setShowAuthModal(true);
+      return;
+    }
 
     // Start 3-second countdown before consuming tokens
     setCountdown(3);
@@ -162,6 +170,7 @@ export function UploadSection() {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+      <AuthRequiredModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
 
       {/* Countdown Cancel Overlay */}
       <AnimatePresence>

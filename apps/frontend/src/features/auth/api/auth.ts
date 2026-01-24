@@ -64,6 +64,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               token.credits = dbUser.credits;
             }
           } catch { /* Sync failed - continue with OAuth token */ }
+        } else {
+          // For Credentials provider, user object comes from authorize() which returns DB user
+          token.credits = (user as any).credits;
         }
       }
       return token;
@@ -71,6 +74,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        (session.user as any).credits = token.credits;
       }
       return session;
     },

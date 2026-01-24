@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter, usePathname } from "next/navigation";
+import { useParams, useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import {
@@ -41,6 +41,8 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
     const params = useParams();
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const isNewAnalysis = searchParams.get("origin") === "new";
     const cvId = params.id as string;
     const { data: session } = useSession();
 
@@ -488,18 +490,20 @@ export function AnalysisView({ analysisResult, cvData }: AnalysisViewProps) {
                                         {analysisResult.overall_summary}
                                     </p>
                                     <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
-                                        <motion.button
-                                            onClick={() => handleCustomize("analysis")}
-                                            disabled={customizeMutation.isPending}
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="relative px-8 py-3.5 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white font-bold rounded-xl shadow-lg hover:shadow-[0_0_30px_rgba(47,107,255,0.4)] transition-all flex items-center gap-2 overflow-hidden group"
-                                        >
-                                            {customizeMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
-                                            Fix Issues with AI
-                                            {/* Shimmer effect */}
-                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                                        </motion.button>
+                                        {(session?.user as any)?.credits > 0 && isNewAnalysis && (
+                                            <motion.button
+                                                onClick={() => handleCustomize("analysis")}
+                                                disabled={customizeMutation.isPending}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="relative px-8 py-3.5 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white font-bold rounded-xl shadow-lg hover:shadow-[0_0_30px_rgba(47,107,255,0.4)] transition-all flex items-center gap-2 overflow-hidden group"
+                                            >
+                                                {customizeMutation.isPending ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+                                                Fix Issues with AI
+                                                {/* Shimmer effect */}
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                                            </motion.button>
+                                        )}
                                         <motion.button
                                             onClick={() => router.push("/app")}
                                             whileHover={{ scale: 1.02 }}

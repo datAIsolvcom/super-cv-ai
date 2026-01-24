@@ -289,6 +289,16 @@ function RegisterForm() {
     setIsLoading(true);
     setHasError(false);
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setHasError(true);
+      toast.error("Please enter a valid email address");
+      setIsLoading(false);
+      setTimeout(() => setHasError(false), 600);
+      return;
+    }
+
     try {
       const backendUrl = getApiBaseUrl();
       const res = await fetch(`${backendUrl}/auth/register`, {
@@ -429,7 +439,7 @@ function RegisterForm() {
               <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
             </motion.div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <GlowInput
                 type="text"
                 placeholder="Full Name"

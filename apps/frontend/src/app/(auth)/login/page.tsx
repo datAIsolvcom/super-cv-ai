@@ -182,7 +182,6 @@ function GlowInput({
   return (
     <motion.div
       variants={itemVariants}
-      animate={hasError ? "shake" : undefined}
       className="relative"
     >
       <motion.div
@@ -238,6 +237,16 @@ function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     setHasError(false);
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setHasError(true);
+      toast.error("Please enter a valid email address");
+      setIsLoading(false);
+      setTimeout(() => setHasError(false), 600);
+      return;
+    }
 
     try {
       const res = await signIn("credentials", {
@@ -361,7 +370,7 @@ function LoginForm() {
               <div className="h-px bg-slate-200 dark:bg-slate-800 flex-1" />
             </motion.div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <GlowInput
                 type="email"
                 placeholder="Email Address"

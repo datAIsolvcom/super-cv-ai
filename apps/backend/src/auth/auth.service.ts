@@ -20,28 +20,6 @@ export class AuthService {
           lastCreditRefresh: new Date(),
         },
       });
-    } else {
-      user = await this.applyDailyFreeCredit(user);
-    }
-
-    return user;
-  }
-
-  private async applyDailyFreeCredit(user: any) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const lastRefresh = new Date(user.lastCreditRefresh);
-    lastRefresh.setHours(0, 0, 0, 0);
-
-    if (lastRefresh < today && user.credits === 0) {
-      return this.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: 1,
-          lastCreditRefresh: new Date(),
-        },
-      });
     }
 
     return user;
@@ -77,8 +55,7 @@ export class AuthService {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) throw new UnauthorizedException('Invalid credentials');
 
-    const updatedUser = await this.applyDailyFreeCredit(user);
-    const { password: _, ...result } = updatedUser;
+    const { password: _, ...result } = user;
     return result;
   }
 }
