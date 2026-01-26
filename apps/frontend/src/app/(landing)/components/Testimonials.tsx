@@ -57,7 +57,7 @@ export function Testimonials() {
             className="py-24 bg-gradient-to-b from-white via-slate-50 to-white relative overflow-hidden"
         >
             {/* Background decoration */}
-            <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute inset-0 pointer-events-none hidden md:block">
                 <div className="absolute top-1/2 left-0 w-96 h-96 bg-[#2F6BFF]/5 rounded-full blur-3xl -translate-y-1/2" />
                 <div className="absolute top-1/2 right-0 w-96 h-96 bg-[#3CE0B1]/5 rounded-full blur-3xl -translate-y-1/2" />
             </div>

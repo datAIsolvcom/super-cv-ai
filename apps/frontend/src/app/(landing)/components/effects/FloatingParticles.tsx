@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+// Removed framer-motion import
 import { useState, useEffect } from 'react';
 
 interface Particle {
@@ -22,8 +22,8 @@ export function FloatingParticles() {
     const [particles, setParticles] = useState<Particle[]>([]);
 
     useEffect(() => {
-        // Reduced particles: 10 on mobile, 20 on desktop (was 25)
-        const count = window.innerWidth < 768 ? 10 : 20;
+        // Reduced particles: 5 on mobile, 15 on desktop for better performance
+        const count = window.innerWidth < 768 ? 5 : 15;
 
         const generated = Array.from({ length: count }, (_, i) => ({
             id: i,
@@ -44,7 +44,7 @@ export function FloatingParticles() {
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
             {particles.map((particle) => (
-                <motion.div
+                <div
                     key={particle.id}
                     className="absolute rounded-full bg-[#2F6BFF]"
                     style={{
@@ -54,16 +54,8 @@ export function FloatingParticles() {
                         top: `${particle.y}%`,
                         opacity: particle.opacity,
                         willChange: 'transform',
-                    }}
-                    animate={{
-                        y: [-15, 15, -15],
-                        x: [-8, 8, -8],
-                    }}
-                    transition={{
-                        duration: particle.duration,
-                        repeat: Infinity,
-                        delay: particle.delay,
-                        ease: 'linear',
+                        animation: `float-particle ${particle.duration}s linear infinite`,
+                        animationDelay: `${particle.delay}s`
                     }}
                 />
             ))}

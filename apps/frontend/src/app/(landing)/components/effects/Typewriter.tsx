@@ -8,6 +8,8 @@ interface TypewriterProps {
     className?: string;
     speed?: number;
     delay?: number;
+    onComplete?: () => void;
+    hideCursorOnComplete?: boolean;
 }
 
 /**
@@ -15,9 +17,10 @@ interface TypewriterProps {
  * 
  * Text that types out letter by letter.
  */
-export function Typewriter({ text, className = '', speed = 50, delay = 0 }: TypewriterProps) {
+export function Typewriter({ text, className = '', speed = 50, delay = 0, onComplete, hideCursorOnComplete = false }: TypewriterProps) {
     const [displayText, setDisplayText] = useState('');
     const [started, setStarted] = useState(false);
+    const [isComplete, setIsComplete] = useState(false);
 
     useEffect(() => {
         const startTimer = setTimeout(() => setStarted(true), delay);
@@ -34,18 +37,21 @@ export function Typewriter({ text, className = '', speed = 50, delay = 0 }: Type
                 index++;
             } else {
                 clearInterval(interval);
+                setIsComplete(true);
+                if (onComplete) onComplete();
             }
         }, speed);
 
         return () => clearInterval(interval);
-    }, [started, text, speed]);
+    }, [started, text, speed, onComplete]);
 
     return (
         <span className={className}>
             {displayText}
+            {/* Cursor always renders to reserve space, opacity controls visibility */}
             <motion.span
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
+                animate={hideCursorOnComplete && isComplete ? { opacity: 0 } : { opacity: [1, 0] }}
+                transition={hideCursorOnComplete && isComplete ? { duration: 0 } : { duration: 0.5, repeat: Infinity }}
                 className="inline-block w-[3px] h-[1em] bg-current ml-1"
             />
         </span>

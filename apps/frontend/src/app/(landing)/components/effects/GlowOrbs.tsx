@@ -19,8 +19,8 @@ export function GlowOrbs() {
     if (isMobile) {
         return (
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-[#2F6BFF]/20 rounded-full blur-[100px]" />
-                <div className="absolute top-1/3 -right-32 w-[400px] h-[400px] bg-[#3CE0B1]/15 rounded-full blur-[80px]" />
+                <div className="absolute -top-20 -left-20 w-[300px] h-[300px] bg-[#2F6BFF]/20 rounded-full blur-[60px]" />
+                <div className="absolute top-1/3 -right-32 w-[250px] h-[250px] bg-[#3CE0B1]/15 rounded-full blur-[50px]" />
             </div>
         );
     }

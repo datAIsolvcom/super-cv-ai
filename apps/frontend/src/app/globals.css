@@ -85,6 +85,7 @@ html.dark {
 @layer base {
   html {
     scroll-behavior: smooth;
+    scrollbar-gutter: stable;
   }
 
   body {
@@ -442,6 +443,20 @@ html.dark body::before {
   animation: shimmer-bg 4s ease-in-out infinite;
 }
 
+@keyframes float-particle {
+  0% {
+    transform: translate(-8px, -15px);
+  }
+
+  50% {
+    transform: translate(8px, 15px);
+  }
+
+  100% {
+    transform: translate(-8px, -15px);
+  }
+}
+
 /* Fade in up animation for landing content */
 @keyframes fade-in-up {
   0% {
@@ -551,10 +566,15 @@ html.dark body::before {
 /* Mobile Performance Optimization - Reduce heavy blur effects */
 @media (max-width: 768px) {
 
-  /* Reduce backdrop-blur on glass panels for better mobile rendering */
+  /* DIsable backdrop-blur on glass panels for better mobile rendering performance */
   .glass-panel {
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+
+  html.dark .glass-panel {
+    background-color: rgba(15, 23, 42, 0.95);
   }
 
   /* Hide heavy decorative blur backgrounds on mobile */
@@ -782,9 +802,12 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
 
 /* Badge pulse animation */
 @keyframes badge-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(47, 107, 255, 0.4);
   }
+
   50% {
     box-shadow: 0 0 0 8px rgba(47, 107, 255, 0);
   }
@@ -806,8 +829,15 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
 
 /* Icon bounce on hover */
 @keyframes icon-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
 }
 
 .icon-hover-bounce:hover {
@@ -825,8 +855,15 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
 
 /* Floating animation for cards/elements */
 @keyframes float-subtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 .animate-float {
@@ -835,9 +872,12 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
 
 /* CTA section glow */
 @keyframes cta-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
@@ -864,6 +904,7 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -879,13 +920,14 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
 }
 
 .shimmer-effect {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s infinite;
 }

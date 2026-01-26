@@ -16,9 +16,6 @@ export function FloatingCV() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="relative"
         >
-            {/* Glow effect behind CV */}
-            <div className="absolute -inset-4 bg-gradient-to-br from-[#2F6BFF]/20 to-[#3CE0B1]/20 rounded-3xl blur-2xl" />
-
             {/* Floating animation wrapper */}
             <motion.div
                 animate={{

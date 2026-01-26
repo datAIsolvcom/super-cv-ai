@@ -16,10 +16,10 @@ export function CustomCursor() {
     const cursorX = useMotionValue(-100);
     const cursorY = useMotionValue(-100);
 
-    // Much faster spring for responsive feel
-    const springConfig = { stiffness: 500, damping: 28, mass: 0.5 };
-    const cursorXSpring = useSpring(cursorX, springConfig);
-    const cursorYSpring = useSpring(cursorY, springConfig);
+    // Zero delay: Use motion values directly without springs
+    // const springConfig = { stiffness: 500, damping: 28, mass: 0.5 };
+    // const cursorXSpring = useSpring(cursorX, springConfig);
+    // const cursorYSpring = useSpring(cursorY, springConfig);
 
     useEffect(() => {
         setIsMounted(true);
@@ -77,8 +77,8 @@ export function CustomCursor() {
             {/* Glow effect layer */}
             <motion.div
                 style={{
-                    x: cursorXSpring,
-                    y: cursorYSpring,
+                    x: cursorX, // Direct value
+                    y: cursorY, // Direct value
                     translateX: '-50%',
                     translateY: '-50%',
                     background: 'radial-gradient(circle, rgba(47,107,255,0.4) 0%, rgba(60,224,177,0.2) 50%, transparent 70%)',
@@ -95,8 +95,8 @@ export function CustomCursor() {
             {/* Main cursor - Sparkle shape with gradient */}
             <motion.div
                 style={{
-                    x: cursorXSpring,
-                    y: cursorYSpring,
+                    x: cursorX,
+                    y: cursorY,
                     translateX: '-50%',
                     translateY: '-50%',
                     filter: 'drop-shadow(0 0 6px rgba(47,107,255,0.6)) drop-shadow(0 0 12px rgba(60,224,177,0.4))',
@@ -127,8 +127,8 @@ export function CustomCursor() {
             {/* Outer ring with gradient border + pulse animation */}
             <motion.div
                 style={{
-                    x: cursorXSpring,
-                    y: cursorYSpring,
+                    x: cursorX,
+                    y: cursorY,
                     translateX: '-50%',
                     translateY: '-50%',
                     background: 'linear-gradient(135deg, #2F6BFF 0%, #3CE0B1 100%)',
@@ -150,8 +150,8 @@ export function CustomCursor() {
             {/* Second pulse ring for extra depth */}
             <motion.div
                 style={{
-                    x: cursorXSpring,
-                    y: cursorYSpring,
+                    x: cursorX,
+                    y: cursorY,
                     translateX: '-50%',
                     translateY: '-50%',
                 }}

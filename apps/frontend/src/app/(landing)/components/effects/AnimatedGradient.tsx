@@ -27,8 +27,8 @@ export function AnimatedGradient({ children, className = '' }: AnimatedGradientP
                 {isMobile ? (
                     // Static gradient on mobile for better performance
                     <>
-                        <div className="absolute top-0 -left-20 w-96 h-96 bg-[#2F6BFF]/20 rounded-full blur-3xl" />
-                        <div className="absolute top-1/2 -right-20 w-80 h-80 bg-[#3CE0B1]/20 rounded-full blur-3xl" />
+                        <div className="absolute top-0 -left-20 w-80 h-80 bg-[#2F6BFF]/15 rounded-full blur-2xl" />
+                        <div className="absolute top-1/2 -right-20 w-64 h-64 bg-[#3CE0B1]/15 rounded-full blur-2xl" />
                     </>
                 ) : (
                     // Animated on desktop
