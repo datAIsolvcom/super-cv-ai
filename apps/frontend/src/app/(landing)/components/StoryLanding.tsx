@@ -87,7 +87,7 @@ export default function StoryLanding() {
                             <h4 className="font-semibold text-slate-900 mb-3">Product</h4>
                             <ul className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-sm lg:flex-col lg:gap-y-3 lg:gap-x-0">
                                 <li><a href="#demo" className="hover:text-[#2F6BFF] transition-colors">How It Works</a></li>
-                                <li><a href="#features" className="hover:text-[#2F6BFF] transition-colors">Features</a></li>
+                                <li><a href="#features" className="hover:text-[#2F6BFF] transition-colors">What You Get</a></li>
                                 <li><a href="#pricing" className="hover:text-[#2F6BFF] transition-colors">Pricing</a></li>
                                 <li><a href="#faq" className="hover:text-[#2F6BFF] transition-colors">FAQ</a></li>
                             </ul>

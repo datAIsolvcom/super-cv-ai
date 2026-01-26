@@ -88,7 +88,7 @@ export function Features3D() {
                 >
                     <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#2F6BFF]/10 text-[#2F6BFF] rounded-full text-sm font-medium mb-4">
                         <Sparkles size={14} />
-                        Features
+                        What You Get
                     </span>
                     <h2 className="text-3xl md:text-5xl font-bold text-slate-900">
                         Everything you need to{' '}

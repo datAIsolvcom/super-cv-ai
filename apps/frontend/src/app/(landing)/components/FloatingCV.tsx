@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
  * FloatingCV Component
  * 
  * Animated CV mockup using CSS and Framer Motion.
- * Features gentle floating animation and hover effects.
+ * Features gentle floating animation, stacked effect, and hover effects.
  */
 export function FloatingCV() {
     return (
@@ -29,8 +29,52 @@ export function FloatingCV() {
                 }}
                 className="relative"
             >
-                {/* CV Card */}
-                <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-[320px] border border-slate-100 overflow-hidden">
+                {/* Background CV 2 - furthest back */}
+                <div
+                    className="absolute bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-6 w-[320px] h-[380px] border border-slate-200 opacity-40"
+                    style={{
+                        transform: 'rotate(-6deg) translateX(-30px) translateY(20px)',
+                        zIndex: 1
+                    }}
+                >
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-slate-300" />
+                        <div className="space-y-1">
+                            <div className="h-3 w-24 bg-slate-300 rounded" />
+                            <div className="h-2 w-16 bg-slate-300 rounded" />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="h-2 bg-slate-300 rounded w-full" />
+                        <div className="h-2 bg-slate-300 rounded w-3/4" />
+                        <div className="h-2 bg-slate-300 rounded w-5/6" />
+                    </div>
+                </div>
+
+                {/* Background CV 1 - middle */}
+                <div
+                    className="absolute bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 w-[320px] h-[380px] border border-blue-200 opacity-60"
+                    style={{
+                        transform: 'rotate(-3deg) translateX(-15px) translateY(10px)',
+                        zIndex: 2
+                    }}
+                >
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-blue-200" />
+                        <div className="space-y-1">
+                            <div className="h-3 w-24 bg-blue-200 rounded" />
+                            <div className="h-2 w-16 bg-blue-200 rounded" />
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <div className="h-2 bg-blue-200 rounded w-full" />
+                        <div className="h-2 bg-blue-200 rounded w-4/5" />
+                        <div className="h-2 bg-blue-200 rounded w-2/3" />
+                    </div>
+                </div>
+
+                {/* Main CV Card - front */}
+                <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-[320px] border border-slate-100 overflow-hidden" style={{ zIndex: 3 }}>
                     {/* Score Badge */}
                     <motion.div
                         initial={{ scale: 0 }}
@@ -112,3 +156,4 @@ export function FloatingCV() {
         </motion.div>
     );
 }
+

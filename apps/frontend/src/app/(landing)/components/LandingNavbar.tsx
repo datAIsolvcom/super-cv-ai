@@ -19,7 +19,7 @@ export function LandingNavbar() {
 
     const navLinks = [
         { href: '#demo', label: 'How It Works' },
-        { href: '#features', label: 'Features' },
+        { href: '#features', label: 'What You Get' },
         { href: '#pricing', label: 'Pricing' },
         { href: '#faq', label: 'FAQ' },
     ];
@@ -85,7 +85,7 @@ export function LandingNavbar() {
                                     href="/app"
                                     className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity btn-hover-lift btn-arrow-slide"
                                 >
-                                    Get Started
+                                    Analyze My CV
                                     <ArrowRight size={14} className="arrow-icon" />
                                 </Link>
                             </>
@@ -146,7 +146,7 @@ export function LandingNavbar() {
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white font-semibold rounded-xl mt-2"
                                         >
-                                            Get Started Free
+                                            Analyze My CV
                                             <ArrowRight size={18} />
                                         </Link>
                                     </>

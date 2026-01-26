@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface TypewriterProps {
     text: string;
@@ -16,21 +16,39 @@ interface TypewriterProps {
  * Typewriter Component
  * 
  * Text that types out letter by letter.
+ * Animation plays once on mount and persists across re-renders.
  */
-export function Typewriter({ text, className = '', speed = 50, delay = 0, onComplete, hideCursorOnComplete = false }: TypewriterProps) {
+export function Typewriter({
+    text,
+    className = '',
+    speed = 50,
+    delay = 0,
+    onComplete,
+    hideCursorOnComplete = false
+}: TypewriterProps) {
     const [displayText, setDisplayText] = useState('');
     const [started, setStarted] = useState(false);
     const [isComplete, setIsComplete] = useState(false);
+    const hasAnimated = useRef(false);
 
+    // Start delay timer (only once)
     useEffect(() => {
-        const startTimer = setTimeout(() => setStarted(true), delay);
+        if (hasAnimated.current) return;
+
+        const startTimer = setTimeout(() => {
+            setStarted(true);
+        }, delay);
+
         return () => clearTimeout(startTimer);
     }, [delay]);
 
+    // Typing animation (only once)
     useEffect(() => {
-        if (!started) return;
+        if (!started || hasAnimated.current) return;
 
+        hasAnimated.current = true;
         let index = 0;
+
         const interval = setInterval(() => {
             if (index < text.length) {
                 setDisplayText(text.slice(0, index + 1));
@@ -57,3 +75,4 @@ export function Typewriter({ text, className = '', speed = 50, delay = 0, onComp
         </span>
     );
 }
+
