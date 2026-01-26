@@ -276,32 +276,32 @@ export function UploadSection() {
 
         <div className="bg-slate-100 dark:bg-slate-950/80 rounded-[24px] p-6 md:p-10 border border-slate-200 dark:border-white/5 relative z-10 transition-colors duration-300">
 
-          <div className="flex flex-col items-center gap-6 mb-8">
+          <div className="flex flex-col items-center gap-5 md:gap-6 mb-6 md:mb-8">
             {/* Level 1: Analysis Type Switcher */}
-            <div className="inline-flex bg-white dark:bg-slate-900/80 p-1.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-inner">
+            <div className="inline-flex bg-white dark:bg-slate-900/80 p-1 md:p-1.5 rounded-full border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-inner max-w-full overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setAnalysisType('general')}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-300",
+                  "flex items-center gap-1.5 md:gap-2 px-4 py-2.5 md:px-6 md:py-3 rounded-full text-xs md:text-sm font-bold transition-all duration-300 shrink-0",
                   analysisType === 'general'
                     ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-lg"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 )}
               >
-                <Sparkles size={18} className={analysisType === 'general' ? "text-indigo-400 dark:text-indigo-600" : ""} />
+                <Sparkles size={16} className={analysisType === 'general' ? "text-indigo-400 dark:text-indigo-600" : ""} />
                 <span>General Audit</span>
               </button>
               <button
                 onClick={() => setAnalysisType('job')}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-300",
+                  "flex items-center gap-1.5 md:gap-2 px-4 py-2.5 md:px-6 md:py-3 rounded-full text-xs md:text-sm font-bold transition-all duration-300 shrink-0",
                   analysisType === 'job'
                     ? "bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-lg"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 )}
               >
                 <div className="flex -space-x-1">
-                  <FileText size={18} className={analysisType === 'job' ? "text-indigo-400 dark:text-indigo-600" : ""} />
+                  <FileText size={16} className={analysisType === 'job' ? "text-indigo-400 dark:text-indigo-600" : ""} />
                 </div>
                 <span>Target a Specific Job</span>
               </button>
@@ -315,13 +315,13 @@ export function UploadSection() {
                   animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
                   exit={{ opacity: 0, height: 0, marginTop: 0 }}
                   transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                  className="overflow-hidden"
+                  className="overflow-hidden w-full flex justify-center"
                 >
-                  <div className="inline-flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-300/50 dark:border-white/5 gap-1">
+                  <div className="inline-flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-300/50 dark:border-white/5 gap-1 overflow-x-auto max-w-full">
                     <button
                       onClick={() => setInputMethod('text')}
                       className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200",
+                        "flex items-center gap-2 px-3 py-2 md:px-4 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap",
                         inputMethod === 'text'
                           ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
                           : "text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5"
@@ -333,7 +333,7 @@ export function UploadSection() {
                     <button
                       onClick={() => setInputMethod('link')}
                       className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200",
+                        "flex items-center gap-2 px-3 py-2 md:px-4 rounded-lg text-xs font-semibold transition-all duration-200 whitespace-nowrap",
                         inputMethod === 'link'
                           ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
                           : "text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5"
@@ -348,7 +348,7 @@ export function UploadSection() {
             </AnimatePresence>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 h-auto md:h-[340px]">
+          <div className="grid md:grid-cols-2 gap-5 md:gap-8 h-auto md:h-[340px]">
 
             <div
               onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
