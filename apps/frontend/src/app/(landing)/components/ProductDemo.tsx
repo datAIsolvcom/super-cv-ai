@@ -9,28 +9,28 @@ const steps = [
         id: 1,
         icon: Upload,
         title: 'Upload Your CV',
-        description: 'Drag & drop your PDF or DOCX file. Our secure system processes it instantly.',
+        description: 'Upload your PDF or DOCX CV file. Our secure system processes it instantly.',
         color: '#2F6BFF',
     },
     {
         id: 2,
         icon: Cpu,
-        title: 'AI Deep Analysis',
-        description: 'Advanced AI scans 50+ optimization points: keywords, formatting, ATS compatibility.',
+        title: 'AI Analyzes Your CV',
+        description: 'We analyze your CV through our SuperCV AI Model for deep insights.',
         color: '#8B5CF6',
     },
     {
         id: 3,
         icon: Sparkles,
-        title: 'Get Smart Insights',
-        description: 'Receive personalized recommendations to improve your CV score and visibility.',
+        title: 'Get Your Score & Fixes',
+        description: 'You get your CV score and personalized CV improvement recommendations.',
         color: '#3CE0B1',
     },
     {
         id: 4,
         icon: CheckCircle,
-        title: 'Land Your Dream Job',
-        description: 'Apply with confidence and get 3× more interview callbacks.',
+        title: 'Apply with Super CV',
+        description: 'Apply with your new improvised Super CV and land your dream job!',
         color: '#10B981',
     },
 ];
@@ -101,8 +101,8 @@ export function ProductDemo() {
 
                             {/* Card */}
                             <div className={`relative bg-white rounded-2xl p-6 border-2 transition-all duration-300 ${activeStep === step.id
-                                    ? 'border-[#2F6BFF] shadow-xl shadow-[#2F6BFF]/10 scale-105'
-                                    : 'border-slate-100 hover:border-slate-200 hover:shadow-lg'
+                                ? 'border-[#2F6BFF] shadow-xl shadow-[#2F6BFF]/10 scale-105'
+                                : 'border-slate-100 hover:border-slate-200 hover:shadow-lg'
                                 }`}>
                                 {/* Step number badge */}
                                 <div
