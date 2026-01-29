@@ -160,7 +160,9 @@ export function FAQ() {
                             Our support team is here to help you 24/7.
                         </p>
                         <a
-                            href="mailto:support@supercv.ai"
+                            href="https://wa.me/6285121313040"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#2F6BFF] font-semibold rounded-xl border border-[#2F6BFF]/20 hover:border-[#2F6BFF] hover:shadow-lg transition-all"
                         >
                             Contact Support
