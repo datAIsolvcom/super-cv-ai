@@ -2,9 +2,25 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { Check, Sparkles, Zap, Crown, Shield, ArrowRight, Loader2 } from 'lucide-react';
+import { Check, Sparkles, Zap, Crown, Shield, ArrowRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+
+// WhatsApp number from contact support
+const WHATSAPP_NUMBER = '6285121313040';
+
+// Helper to generate WhatsApp URL
+const getWhatsAppUrl = (packageName: string, packagePrice: string) => {
+    const message = `Halo SuperCV!
+
+Saya tertarik untuk membeli paket kredit:
+
+*Paket*: ${packageName}
+*Harga*: ${packagePrice}
+
+Mohon informasi cara pembayarannya. Terima kasih!`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+};
 
 const creditPackages = [
     {
@@ -48,49 +64,19 @@ export function Pricing() {
     const containerRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(containerRef, { once: true, margin: '-100px' });
     const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
-    const [loadingPackage, setLoadingPackage] = useState<number | null>(null);
     const { data: session } = useSession();
     const router = useRouter();
 
-    const handlePurchase = async (packageId: number) => {
-        if (!session?.user?.id) {
+    // Handle purchase - check login first, then redirect to WhatsApp
+    const handlePurchase = (packageName: string, packagePrice: string) => {
+        if (!session?.user) {
+            // User not logged in - redirect to login with redirect back to pricing
             router.push('/login?redirect=/pricing');
             return;
         }
 
-        setLoadingPackage(packageId);
-
-        try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/create-checkout`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'userId': session.user.id,
-                },
-                body: JSON.stringify({ packageId }),
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Payment API error:', response.status, errorText);
-                alert(`Payment failed: ${response.statusText || 'Server error'}`);
-                return;
-            }
-
-            const data = await response.json();
-
-            if (data.paymentUrl) {
-                window.location.href = data.paymentUrl;
-            } else {
-                console.error('Payment error - no URL:', data);
-                alert(data.message || 'Failed to create payment. Please try again.');
-            }
-        } catch (error) {
-            console.error('Payment error:', error);
-            alert('Failed to create payment. Please try again.');
-        } finally {
-            setLoadingPackage(null);
-        }
+        // User is logged in - open WhatsApp
+        window.open(getWhatsAppUrl(packageName, packagePrice), '_blank');
     };
 
     return (
@@ -277,24 +263,14 @@ export function Pricing() {
 
                                 {/* CTA */}
                                 <button
-                                    onClick={() => handlePurchase(pkg.id)}
-                                    disabled={loadingPackage !== null}
-                                    className={`group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold transition-all disabled:opacity-70 disabled:cursor-not-allowed ${pkg.popular
+                                    onClick={() => handlePurchase(pkg.name, pkg.price)}
+                                    className={`group flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl font-semibold transition-all ${pkg.popular
                                         ? 'bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] text-white hover:shadow-lg hover:shadow-[#2F6BFF]/25'
                                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                                         }`}
                                 >
-                                    {loadingPackage === pkg.id ? (
-                                        <>
-                                            <Loader2 size={16} className="animate-spin" />
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        <>
-                                            Buy {pkg.name}
-                                            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    )}
+                                    Buy {pkg.name}
+                                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </motion.div>
                         </motion.div>
@@ -320,7 +296,7 @@ export function Pricing() {
                     <div className="w-1 h-1 rounded-full bg-slate-300" />
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                         <Shield size={16} className="text-[#3CE0B1]" />
-                        Secure payment via Mayar
+                        Order via WhatsApp
                     </div>
                 </motion.div>
             </div>

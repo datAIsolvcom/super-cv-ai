@@ -774,6 +774,8 @@ body:not(.dify-chat-enabled) #dify-chatbot-bubble-window {
   mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
+  /* Allow clicks to pass through to content */
 }
 
 .card-gradient-border:hover::before {
