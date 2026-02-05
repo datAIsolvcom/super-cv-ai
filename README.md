@@ -5,11 +5,12 @@
 
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-16.1-black?logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Next.js-15-black?logo=next.js" alt="Next.js" />
   <img src="https://img.shields.io/badge/NestJS-11-e0234e?logo=nestjs" alt="NestJS" />
   <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi" alt="FastAPI" />
   <img src="https://img.shields.io/badge/PostgreSQL-15-336791?logo=postgresql" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker" alt="Docker" />
+  <img src="https://img.shields.io/badge/Gemini_AI-Powered-4285F4?logo=google" alt="Gemini AI" />
 </p>
 
 ---
@@ -280,6 +281,13 @@ Create a `.env` file in the root directory based on `.env.example`:
 - **Intelligent Scoring** — Real-time CV scoring based on industry standards
 - **Weakness Detection** — Identifies areas for improvement
 - **Tailored Recommendations** — Personalized suggestions based on target job
+- **ATS Optimization** — Ensure your CV passes Applicant Tracking Systems
+
+### 💳 Credit-Based System
+- **1 Free Credit** — Every new user gets 1 free credit to try the service
+- **Flexible Pricing** — Purchase credits in packages (1, 3, or 5 credits)
+- **Never Expires** — Purchased credits never expire
+- **WhatsApp Ordering** — Easy credit purchase via WhatsApp (payment gateway coming soon)
 
 ### 📄 Smart Document Processing
 - **PDF Parsing** — Extract content from PDF resumes
@@ -290,6 +298,7 @@ Create a `.env` file in the root directory based on `.env.example`:
 - **Premium UI** — Modern, glassmorphic design with Framer Motion animations
 - **Drag & Drop Editor** — Intuitive CV section reordering
 - **Real-time Updates** — Live preview as you edit
+- **Custom Cursor Effects** — Premium interactive cursor design
 
 ### 🔐 Enterprise Security
 - **Google OAuth** — Secure authentication via NextAuth.js
@@ -300,6 +309,11 @@ Create a `.env` file in the root directory based on `.env.example`:
 - **URL Scraping** — Automatically fetch job descriptions from URLs
 - **Custom JD Input** — Paste job descriptions directly
 - **AI Customization** — Tailor your CV to specific job requirements
+- **Multi-language Support** — Customize CV language for different markets
+
+### 🤖 AI Career Coach (Dify Integration)
+- **Interactive Chatbot** — Get career advice and CV tips
+- **Contextual Help** — AI assistant understands your CV context
 
 ### 🚀 Production Ready
 - **Docker Compose** — One-command deployment
