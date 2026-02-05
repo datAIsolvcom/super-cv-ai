@@ -277,7 +277,7 @@ export function EditorLayout() {
             <motion.div
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
-                className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+                className="md:hidden fixed bottom-0 left-0 right-0 z-50 print:hidden mobile-tab-bar"
             >
                 <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-200/50 dark:border-white/10" />
                 <div className="relative flex gap-3 p-4 pb-8 safe-area-pb">

@@ -40,16 +40,40 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
 
   const [showPrintHelp, setShowPrintHelp] = useState(false);
 
-  // Print styles for clean PDF output
+  // Print styles for clean PDF output - enhanced for mobile
   const pageStyle = `
     @page {
-      size: A4;
+      size: A4 portrait;
       margin: 10mm;
     }
     @media print {
       html, body {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        background: white !important;
+        color: black !important;
+      }
+      /* Reset all transforms - CRITICAL for mobile blank PDF fix */
+      * {
+        transform: none !important;
+        -webkit-transform: none !important;
+      }
+      /* Hide mobile navigation */
+      .mobile-tab-bar,
+      .md\\:hidden.fixed.bottom-0 {
+        display: none !important;
+      }
+      /* Reset scaled containers */
+      .origin-top-left {
+        transform: none !important;
+        -webkit-transform: none !important;
+      }
+      /* Ensure print content is full size */
+      [data-print-content] {
+        width: 210mm !important;
+        min-height: 297mm !important;
+        transform: none !important;
       }
     }
   `;
@@ -58,6 +82,19 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
     contentRef: printRef,
     documentTitle: "My_CV",
     pageStyle: pageStyle,
+    onBeforePrint: async () => {
+      // Force the print ref to be visible at full size before printing
+      if (printRef.current) {
+        printRef.current.setAttribute('data-print-content', 'true');
+      }
+      return Promise.resolve();
+    },
+    onAfterPrint: () => {
+      // Clean up after printing
+      if (printRef.current) {
+        printRef.current.removeAttribute('data-print-content');
+      }
+    },
   });
 
   const onSavePdfClick = () => {
@@ -112,7 +149,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="sticky top-2 z-50 w-[95%] max-w-5xl mx-auto"
+        className="sticky top-2 z-50 w-[95%] max-w-5xl mx-auto print:hidden ribbon-bar"
       >
         <div className="relative glass-panel rounded-2xl p-2 flex flex-wrap items-center justify-center md:justify-between gap-2 shadow-xl">
           <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
@@ -419,11 +456,11 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                 <div className="bg-[#2F6BFF]/10 dark:bg-[#2F6BFF]/20 border border-[#2F6BFF]/20 dark:border-[#2F6BFF]/30 rounded-lg p-3 space-y-2">
                   <div className="flex items-start gap-2">
                     <span className="text-[#2F6BFF] font-bold">1.</span>
-                    <span>Destination: <strong>"Save as PDF"</strong></span>
+                    <span>Destination: <strong>&quot;Save as PDF&quot;</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-[#2F6BFF] font-bold">2.</span>
-                    <span>Margins: <strong>"None"</strong> or <strong>"Minimum"</strong></span>
+                    <span>Margins: <strong>&quot;None&quot;</strong> or <strong>&quot;Minimum&quot;</strong></span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="text-[#2F6BFF] font-bold">3.</span>
@@ -433,6 +470,12 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
                     <span className="text-[#2F6BFF] font-bold">4.</span>
                     <span>Background graphics: <strong>Check ☑</strong></span>
                   </div>
+                </div>
+                {/* Mobile Safari specific tip */}
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 md:hidden">
+                  <p className="text-amber-800 dark:text-amber-200 text-xs">
+                    <strong>📱 Mobile Safari:</strong> If you see &quot;blocked from automatically printing&quot;, tap <strong>&quot;Allow&quot;</strong> to enable PDF saving.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-3">

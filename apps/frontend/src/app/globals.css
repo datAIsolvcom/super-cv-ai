@@ -508,17 +508,121 @@ html.dark body::before {
 }
 
 @media print {
+  /* ============================================
+     MOBILE-OPTIMIZED PRINT STYLES
+     Fixes blank PDF issues on iOS Safari/Chrome
+     ============================================ */
 
-
+  /* Force color printing */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
+  /* Reset all transforms - CRITICAL for mobile blank PDF fix */
+  *,
+  *::before,
+  *::after {
+    transform: none !important;
+    -webkit-transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
 
-  .cv-paper {
+  /* Force page size and margins */
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  /* Hide everything except print content */
+  body>*:not(.print-content-wrapper) {
+    /* Allow the print wrapper to be visible */
+  }
+
+  /* Force light mode for print */
+  html,
+  body {
     background: white !important;
     color: black !important;
+    color-scheme: light !important;
+    -webkit-text-size-adjust: 100% !important;
+  }
+
+  /* Hide mobile navigation footer */
+  .mobile-tab-bar,
+  [class*="md:hidden"][class*="fixed"][class*="bottom-0"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Hide all fixed/sticky elements that aren't the CV */
+  .sticky,
+  [class*="sticky"],
+  [class*="fixed"]:not([data-print-content]) {
+    position: static !important;
+  }
+
+  /* Hide UI elements */
+  .print\:hidden,
+  [class*="print:hidden"],
+  .ribbon-bar,
+  .glass-panel,
+  button:not([data-print-keep]),
+  [contenteditable]:hover,
+  .cursor-grab,
+  .opacity-0,
+  [class*="hover:opacity"],
+  .backdrop-blur-sm,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl {
+    opacity: 1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Hide decorative elements */
+  [class*="blur-"],
+  [class*="shadow-"],
+  .absolute.inset-0[class*="bg-gradient"],
+  .pointer-events-none[class*="absolute"] {
+    display: none !important;
+  }
+
+  /* CV Paper container - ensure full size */
+  .cv-paper,
+  [data-print-content] {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-width: 210mm !important;
+    padding: 10mm !important;
+    margin: 0 !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+    transform: none !important;
+    -webkit-transform: none !important;
+    scale: 1 !important;
+  }
+
+  /* Reset the scaled container for mobile */
+  .origin-top-left[class*="scale-"] {
+    transform: none !important;
+    -webkit-transform: none !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  /* Ensure A4 aspect ratio container shows full size */
+  .aspect-\[210\/297\] {
+    aspect-ratio: auto !important;
+    width: 210mm !important;
+    min-height: 297mm !important;
   }
 
   /* Preserve hyperlinks in printed PDF */
@@ -531,6 +635,8 @@ html.dark body::before {
   [contenteditable] {
     outline: none !important;
     background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
   /* Hide all left borders and hover effects in print */
@@ -550,6 +656,49 @@ html.dark body::before {
   /* Ensure consistent section padding in print */
   .group.relative.pl-4 {
     padding-left: 0 !important;
+  }
+
+  /* Force text visibility */
+  p,
+  span,
+  div,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  a {
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Page break handling */
+  .print\:break-inside-avoid,
+  [class*="print:break-inside-avoid"] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print\:break-after-avoid,
+  [class*="print:break-after-avoid"] {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Ensure the CV content wrapper is visible and properly sized */
+  .overflow-auto,
+  .overflow-hidden,
+  .overflow-y-auto,
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  /* Hide scrollbars */
+  ::-webkit-scrollbar {
+    display: none !important;
   }
 }
 
