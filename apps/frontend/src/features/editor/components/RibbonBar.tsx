@@ -207,6 +207,15 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       // Wait for styles to fully apply and fonts to load
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // Adjust SVG icons in the clone for proper alignment in PDF
+      // html2canvas renders SVGs differently, so we need to push them down
+      const headerIcons = clone.querySelectorAll('header svg');
+      headerIcons.forEach((icon) => {
+        const svgIcon = icon as SVGElement;
+        svgIcon.style.position = 'relative';
+        svgIcon.style.top = '3px';
+      });
+
       // Get dimensions
       const captureWidth = clone.scrollWidth;
       const captureHeight = clone.scrollHeight;
