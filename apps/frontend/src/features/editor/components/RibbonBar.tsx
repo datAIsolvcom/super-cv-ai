@@ -115,6 +115,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
   });
 
   // Mobile PDF generation using html2canvas + jsPDF directly
+  // Uses an iframe with desktop viewport to force desktop CSS media queries
   const generateMobilePdf = async () => {
     if (!printRef.current) return;
 
@@ -128,80 +129,102 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
 
       const element = printRef.current;
 
-      // Store all original styles from parent containers
-      const scaledContainer = element.closest('.origin-top-left') as HTMLElement;
-      const absoluteContainer = element.closest('.absolute') as HTMLElement;
-      const overflowContainer = absoluteContainer?.parentElement as HTMLElement;
+      // Create a hidden iframe with desktop-sized viewport
+      // This forces CSS media queries to evaluate as desktop
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = `
+        position: fixed;
+        left: -9999px;
+        top: 0;
+        width: 794px;
+        height: 1123px;
+        border: none;
+        visibility: hidden;
+      `;
+      document.body.appendChild(iframe);
 
-      // Save original styles
-      const savedStyles = {
-        element: element.style.cssText,
-        scaledContainer: scaledContainer?.style.cssText || '',
-        absoluteContainer: absoluteContainer?.style.cssText || '',
-        overflowContainer: overflowContainer?.style.cssText || '',
-      };
-
-      // Hide UI elements (buttons, hover elements) by adding a class
-      const uiElements = element.querySelectorAll('button, [class*="opacity-0"], [class*="group-hover"]');
-      uiElements.forEach(el => {
-        (el as HTMLElement).style.visibility = 'hidden';
+      // Wait for iframe to be ready
+      await new Promise(resolve => {
+        iframe.onload = resolve;
+        // Set a blank src to trigger load
+        iframe.srcdoc = '<!DOCTYPE html><html><head></head><body></body></html>';
       });
 
-      // Temporarily modify styles for capture
-      // 1. Remove overflow clipping from parent container
-      if (overflowContainer) {
-        overflowContainer.style.overflow = 'visible';
-        overflowContainer.style.height = 'auto';
+      const iframeDoc = iframe.contentDocument;
+      const iframeWin = iframe.contentWindow;
+
+      if (!iframeDoc || !iframeWin) {
+        throw new Error('Failed to create iframe');
       }
 
-      // 2. Remove absolute positioning that clips content
-      if (absoluteContainer) {
-        absoluteContainer.style.position = 'relative';
-        absoluteContainer.style.inset = 'auto';
-        absoluteContainer.style.overflow = 'visible';
-      }
+      // Copy all stylesheets to iframe
+      const styleSheets = document.querySelectorAll('link[rel="stylesheet"], style');
+      styleSheets.forEach(sheet => {
+        const clonedSheet = sheet.cloneNode(true);
+        iframeDoc.head.appendChild(clonedSheet);
+      });
 
-      // 3. Remove scale transform and set full A4 width
-      if (scaledContainer) {
-        scaledContainer.style.transform = 'none';
-        scaledContainer.style.width = '794px'; // 210mm at 96dpi
-        scaledContainer.style.minHeight = 'auto';
-      }
+      // Also copy any inline styles from the main document head
+      const mainStyles = document.querySelectorAll('head style');
+      mainStyles.forEach(style => {
+        const clonedStyle = style.cloneNode(true);
+        iframeDoc.head.appendChild(clonedStyle);
+      });
 
-      // 4. Set element to full A4 size
-      element.style.width = '794px';
-      element.style.minHeight = 'auto';
-      element.style.transform = 'none';
+      // Clone the CV element into the iframe body
+      const clone = element.cloneNode(true) as HTMLElement;
 
-      // Wait for styles to apply and layout to recalculate
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Set proper dimensions on the clone
+      clone.style.cssText = `
+        width: 794px !important;
+        min-height: auto !important;
+        transform: none !important;
+        position: relative !important;
+        background: white !important;
+      `;
 
-      // Get dimensions after style changes
-      const captureWidth = element.scrollWidth;
-      const captureHeight = element.scrollHeight;
+      // Remove UI elements from clone
+      clone.querySelectorAll('button').forEach(btn => btn.remove());
+      clone.querySelectorAll('[class*="opacity-0"]').forEach(el => el.remove());
+      clone.querySelectorAll('[class*="group-hover"]').forEach(el => el.remove());
+      clone.querySelectorAll('[draggable="true"]').forEach(el => {
+        (el as HTMLElement).removeAttribute('draggable');
+      });
 
-      // Capture the element at high resolution
-      const canvas = await html2canvas(element, {
+      // Set body styles
+      iframeDoc.body.style.cssText = `
+        margin: 0;
+        padding: 0;
+        width: 794px;
+        background: white;
+      `;
+
+      iframeDoc.body.appendChild(clone);
+
+      // Force a reflow to apply styles
+      void clone.offsetHeight;
+
+      // Wait for styles to fully apply and fonts to load
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get dimensions
+      const captureWidth = clone.scrollWidth;
+      const captureHeight = clone.scrollHeight;
+
+      // Capture the clone from within the iframe
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
         width: captureWidth,
         height: captureHeight,
-        scrollX: 0,
-        scrollY: -window.scrollY, // Account for scroll position
+        windowWidth: 794,
+        windowHeight: 1123,
       });
 
-      // Restore all original styles immediately
-      element.style.cssText = savedStyles.element;
-      if (scaledContainer) scaledContainer.style.cssText = savedStyles.scaledContainer;
-      if (absoluteContainer) absoluteContainer.style.cssText = savedStyles.absoluteContainer;
-      if (overflowContainer) overflowContainer.style.cssText = savedStyles.overflowContainer;
-
-      // Restore visibility of UI elements
-      uiElements.forEach(el => {
-        (el as HTMLElement).style.visibility = '';
-      });
+      // Remove the iframe
+      document.body.removeChild(iframe);
 
       // Create PDF
       const pdf = new jsPDF({
