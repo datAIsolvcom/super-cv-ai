@@ -239,7 +239,7 @@ function SectionHeader({ title, onSave, design, className, Field, children }: {
       className={cn("flex justify-between items-center mb-2", className)}
       style={{
         borderBottom: `1px solid ${design.accentColor}`,
-        paddingBottom: '4px',
+        paddingBottom: '8px',
         position: 'relative',
       }}
     >
