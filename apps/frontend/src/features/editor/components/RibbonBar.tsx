@@ -211,6 +211,20 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       const captureWidth = clone.scrollWidth;
       const captureHeight = clone.scrollHeight;
 
+      // IMPORTANT: Get section positions BEFORE capturing canvas (while clone is in DOM)
+      const sectionHeaders = clone.querySelectorAll('h2');
+      const sectionPositions: number[] = [];
+
+      sectionHeaders.forEach((header) => {
+        const rect = header.getBoundingClientRect();
+        const cloneRect = clone.getBoundingClientRect();
+        // Get position relative to clone (will be multiplied by scale later)
+        const relativeTop = rect.top - cloneRect.top;
+        sectionPositions.push(relativeTop);
+      });
+
+      console.log('Section positions (before scale):', sectionPositions);
+
       // Capture the clone from within the iframe
       const canvas = await html2canvas(clone, {
         scale: 2,
@@ -240,26 +254,21 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       const ratio = pdfWidth / canvas.width;
       const scaledCanvasHeight = canvas.height * ratio;
 
+      // Scale section positions to match canvas (scale=2)
+      const scaledSectionPositions = sectionPositions.map(pos => pos * 2);
+      console.log('Scaled section positions:', scaledSectionPositions);
+      console.log('Canvas height:', canvas.height);
+
       // If content fits on one page
       if (scaledCanvasHeight <= pdfHeight) {
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, scaledCanvasHeight);
       } else {
-        // Smart multi-page: find section boundaries to avoid orphaned headers
-        // Find all section headers in the clone to detect good break points
-        const sectionHeaders = clone.querySelectorAll('h2');
-        const sectionPositions: number[] = [];
-
-        sectionHeaders.forEach((header) => {
-          const rect = header.getBoundingClientRect();
-          const cloneRect = clone.getBoundingClientRect();
-          // Get position relative to clone, then multiply by scale (2)
-          const relativeTop = (rect.top - cloneRect.top) * 2;
-          sectionPositions.push(relativeTop);
-        });
-
+        // Smart multi-page: use section positions to avoid orphaned headers
         const pixelsPerPage = pdfHeight / ratio;
         const pageBreaks: number[] = [0]; // Start positions for each page
+
+        console.log('Pixels per page:', pixelsPerPage);
 
         let currentPos = pixelsPerPage;
         while (currentPos < canvas.height) {
@@ -269,11 +278,12 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
 
           let adjustedBreak = currentPos;
 
-          for (const headerPos of sectionPositions) {
+          for (const headerPos of scaledSectionPositions) {
             // If a header would appear in the "danger zone" at bottom of page
             if (headerPos > breakZoneStart && headerPos < currentPos) {
               // Move page break to just before this header (with small margin)
-              adjustedBreak = headerPos - 20; // 20px margin above header
+              adjustedBreak = headerPos - 40; // 40px margin above header
+              console.log(`Moving page break from ${currentPos} to ${adjustedBreak} (header at ${headerPos})`);
               break;
             }
           }
@@ -284,6 +294,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
 
         // Add final position
         pageBreaks.push(canvas.height);
+        console.log('Page breaks:', pageBreaks);
 
         // Generate pages based on calculated break points
         for (let page = 0; page < pageBreaks.length - 1; page++) {
