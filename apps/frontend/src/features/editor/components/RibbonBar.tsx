@@ -281,8 +281,8 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
           for (const headerPos of scaledSectionPositions) {
             // If a header would appear in the "danger zone" at bottom of page
             if (headerPos > breakZoneStart && headerPos < currentPos) {
-              // Move page break to just before this header (with small margin)
-              adjustedBreak = headerPos - 40; // 40px margin above header
+              // Move page break to just before this header (with margin)
+              adjustedBreak = headerPos - 60; // Larger margin to ensure header isn't at edge
               console.log(`Moving page break from ${currentPos} to ${adjustedBreak} (header at ${headerPos})`);
               break;
             }
@@ -295,6 +295,11 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
         // Add final position
         pageBreaks.push(canvas.height);
         console.log('Page breaks:', pageBreaks);
+
+        // Page margins in mm
+        const pageMarginTop = 10;
+        const pageMarginBottom = 10;
+        const usablePageHeight = pdfHeight - pageMarginTop - pageMarginBottom;
 
         // Generate pages based on calculated break points
         for (let page = 0; page < pageBreaks.length - 1; page++) {
@@ -323,8 +328,10 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
             );
 
             const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
-            const thisPageHeight = sourceHeight * ratio;
-            pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, thisPageHeight);
+            const thisPageHeight = Math.min(sourceHeight * ratio, usablePageHeight);
+
+            // Place content with top margin
+            pdf.addImage(pageImgData, 'JPEG', 0, pageMarginTop, pdfWidth, thisPageHeight);
           }
         }
       }
