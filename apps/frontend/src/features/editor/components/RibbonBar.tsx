@@ -148,6 +148,24 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       const originalAbsolutePosition = absoluteContainer?.style.position || '';
       const originalAbsoluteOverflow = absoluteContainer?.style.overflow || '';
 
+      // Hide all UI-only elements before capture (buttons, add links, etc.)
+      // These elements have opacity-0 and are shown on hover - hide them completely
+      const uiElements = element.querySelectorAll('button, [class*="opacity-0"]');
+      const hiddenElements: { el: HTMLElement; originalDisplay: string }[] = [];
+      uiElements.forEach(el => {
+        const htmlEl = el as HTMLElement;
+        hiddenElements.push({ el: htmlEl, originalDisplay: htmlEl.style.display });
+        htmlEl.style.display = 'none';
+      });
+
+      // Also hide any editable placeholders or hover states
+      const hoverElements = element.querySelectorAll('[class*="group-hover"]');
+      hoverElements.forEach(el => {
+        const htmlEl = el as HTMLElement;
+        hiddenElements.push({ el: htmlEl, originalDisplay: htmlEl.style.display });
+        htmlEl.style.display = 'none';
+      });
+
       // Temporarily modify styles to render at full A4 size
       if (absoluteContainer) {
         absoluteContainer.style.position = 'relative';
@@ -202,6 +220,11 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       element.style.position = originalPosition;
       element.style.left = originalLeft;
       element.style.top = originalTop;
+
+      // Restore hidden UI elements
+      hiddenElements.forEach(({ el, originalDisplay }) => {
+        el.style.display = originalDisplay;
+      });
 
       // Create PDF - handle multi-page content
       const pdf = new jsPDF({
