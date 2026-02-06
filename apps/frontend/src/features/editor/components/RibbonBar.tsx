@@ -133,52 +133,110 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       const originalTransform = element.style.transform;
       const originalWidth = element.style.width;
       const originalMinHeight = element.style.minHeight;
+      const originalPosition = element.style.position;
+      const originalLeft = element.style.left;
+      const originalTop = element.style.top;
 
       // Find the parent container that has the scale transform
       const scaledContainer = element.closest('.origin-top-left') as HTMLElement;
       const originalContainerTransform = scaledContainer?.style.transform || '';
+      const originalContainerWidth = scaledContainer?.style.width || '';
+      const originalContainerMinHeight = scaledContainer?.style.minHeight || '';
 
-      // Temporarily remove transforms and set full size
+      // Temporarily remove transforms and set full size for proper capture
       if (scaledContainer) {
         scaledContainer.style.transform = 'none';
+        scaledContainer.style.width = '794px'; // A4 width at 96 DPI
+        scaledContainer.style.minHeight = 'auto';
       }
       element.style.transform = 'none';
-      element.style.width = '210mm';
-      element.style.minHeight = '297mm';
+      element.style.width = '794px'; // A4 width at 96 DPI
+      element.style.minHeight = 'auto';
+      element.style.position = 'relative';
+      element.style.left = 'auto';
+      element.style.top = 'auto';
 
-      // Wait for the styles to apply
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for the styles to apply and layout to recalculate
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Capture the element at high resolution
+      // Get the actual dimensions of the content
+      const elementWidth = element.scrollWidth;
+      const elementHeight = element.scrollHeight;
+
+      // Capture the element at high resolution - let html2canvas determine the full size
       const canvas = await html2canvas(element, {
         scale: 2, // Higher scale for better quality
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 794, // A4 width in pixels at 96 DPI
-        height: 1123, // A4 height in pixels at 96 DPI
-        windowWidth: 794,
-        windowHeight: 1123,
+        width: elementWidth,
+        height: elementHeight,
+        scrollX: 0,
+        scrollY: 0,
       });
 
       // Restore original styles
       if (scaledContainer) {
         scaledContainer.style.transform = originalContainerTransform;
+        scaledContainer.style.width = originalContainerWidth;
+        scaledContainer.style.minHeight = originalContainerMinHeight;
       }
       element.style.transform = originalTransform;
       element.style.width = originalWidth;
       element.style.minHeight = originalMinHeight;
+      element.style.position = originalPosition;
+      element.style.left = originalLeft;
+      element.style.top = originalTop;
 
-      // Create PDF from canvas
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      // Create PDF - handle multi-page content
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
 
-      // Add the image to cover the full A4 page
-      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+      const pdfWidth = 210; // A4 width in mm
+      const pdfHeight = 297; // A4 height in mm
+
+      // Calculate the image dimensions to fit the PDF width
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      // If the image fits on one page
+      if (imgHeight <= pdfHeight) {
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+      } else {
+        // Multi-page handling: split the canvas into pages
+        const pageCount = Math.ceil(imgHeight / pdfHeight);
+        const sourceImgHeight = canvas.height / pageCount;
+
+        for (let i = 0; i < pageCount; i++) {
+          if (i > 0) {
+            pdf.addPage();
+          }
+
+          // Create a temporary canvas for this page section
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sourceImgHeight;
+          const ctx = pageCanvas.getContext('2d');
+
+          if (ctx) {
+            // Draw the portion of the original canvas for this page
+            ctx.drawImage(
+              canvas,
+              0, i * sourceImgHeight, // Source x, y
+              canvas.width, sourceImgHeight, // Source width, height
+              0, 0, // Destination x, y
+              canvas.width, sourceImgHeight // Destination width, height
+            );
+
+            const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+          }
+        }
+      }
 
       // Save the PDF
       pdf.save('My_CV.pdf');
