@@ -5,12 +5,13 @@ import { useEditorStore } from "../stores/useEditorStore";
 import type { DesignSettings, TemplateType } from "../types/editor.types";
 import {
   Type, LayoutTemplate, ChevronDown, CheckCircle2,
-  Ruler, AlignJustify, Palette, Eye, Pencil, FileDown
+  Ruler, AlignJustify, Palette, Eye, Pencil, FileDown, Loader2
 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+
 
 interface RibbonBarProps {
   printRef: RefObject<HTMLDivElement | null>;
@@ -39,6 +40,22 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
   }, []);
 
   const [showPrintHelp, setShowPrintHelp] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  // Detect mobile device
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      // Check for mobile using user agent and screen width
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isMobileDevice = /iphone|ipad|ipod|android|webos|blackberry|windows phone/i.test(userAgent);
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isMobileDevice || isSmallScreen);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Print styles for clean PDF output - enhanced for mobile
   const pageStyle = `
@@ -97,13 +114,83 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
     },
   });
 
+  // Mobile PDF generation using html2pdf.js
+  const generateMobilePdf = async () => {
+    if (!printRef.current) return;
+
+    setIsGeneratingPdf(true);
+    setShowPrintHelp(false);
+
+    try {
+      // Dynamically import html2pdf.js
+      const html2pdf = (await import('html2pdf.js')).default;
+
+      // Clone the element to avoid modifying the original
+      const element = printRef.current.cloneNode(true) as HTMLElement;
+
+      // Apply full-size styling to the clone
+      element.style.transform = 'none';
+      element.style.width = '210mm';
+      element.style.minHeight = '297mm';
+      element.style.padding = '10mm';
+      element.style.background = 'white';
+      element.style.color = 'black';
+      element.style.position = 'absolute';
+      element.style.left = '-9999px';
+      element.style.top = '0';
+
+      // Apply computed styles to ensure proper rendering
+      document.body.appendChild(element);
+
+      const opt = {
+        margin: 0,
+        filename: 'My_CV.pdf',
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          logging: false,
+          windowWidth: 794, // A4 width in pixels at 96 DPI
+          windowHeight: 1123, // A4 height in pixels at 96 DPI
+        },
+        jsPDF: {
+          unit: 'mm' as const,
+          format: 'a4' as const,
+          orientation: 'portrait' as const
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+
+      await html2pdf().set(opt).from(element).save();
+
+      // Clean up
+      document.body.removeChild(element);
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   const onSavePdfClick = () => {
-    setShowPrintHelp(true);
+    if (isMobile) {
+      // On mobile, show a simpler modal and generate PDF directly
+      generateMobilePdf();
+    } else {
+      // On desktop, show print dialog instructions
+      setShowPrintHelp(true);
+    }
   };
 
   const onConfirmPrint = () => {
     setShowPrintHelp(false);
-    handlePrint && handlePrint();
+    if (isMobile) {
+      generateMobilePdf();
+    } else {
+      handlePrint && handlePrint();
+    }
   };
 
   const colors = ["#000000", "#2563eb", "#dc2626", "#16a34a", "#d97706", "#7c3aed", "#db2777", "#0891b2"];
@@ -419,13 +506,26 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
 
             {/* Save PDF Button */}
             <motion.button
-              whileHover={{ scale: 1.03, y: -1 }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: isGeneratingPdf ? 1 : 1.03, y: isGeneratingPdf ? 0 : -1 }}
+              whileTap={{ scale: isGeneratingPdf ? 1 : 0.97 }}
               onClick={onSavePdfClick}
-              className="bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] hover:from-[#1E55F0] hover:to-[#3CE0B1] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-[#2F6BFF]/25 transition-all ml-2"
+              disabled={isGeneratingPdf}
+              className={cn(
+                "bg-gradient-to-r from-[#2F6BFF] to-[#3CE0B1] hover:from-[#1E55F0] hover:to-[#3CE0B1] text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow-lg shadow-[#2F6BFF]/25 transition-all ml-2",
+                isGeneratingPdf && "opacity-75 cursor-not-allowed"
+              )}
             >
-              <FileDown size={16} />
-              <span className="hidden md:inline">Save PDF</span>
+              {isGeneratingPdf ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span className="hidden md:inline">Generating...</span>
+                </>
+              ) : (
+                <>
+                  <FileDown size={16} />
+                  <span className="hidden md:inline">Save PDF</span>
+                </>
+              )}
             </motion.button>
           </div>
         </div>
