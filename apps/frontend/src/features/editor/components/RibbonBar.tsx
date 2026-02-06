@@ -245,26 +245,66 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, scaledCanvasHeight);
       } else {
-        // Multi-page: slice the canvas for each page
-        const pixelsPerPage = pdfHeight / ratio;
-        const totalPages = Math.ceil(canvas.height / pixelsPerPage);
+        // Smart multi-page: find section boundaries to avoid orphaned headers
+        // Find all section headers in the clone to detect good break points
+        const sectionHeaders = clone.querySelectorAll('h2');
+        const sectionPositions: number[] = [];
 
-        for (let page = 0; page < totalPages; page++) {
+        sectionHeaders.forEach((header) => {
+          const rect = header.getBoundingClientRect();
+          const cloneRect = clone.getBoundingClientRect();
+          // Get position relative to clone, then multiply by scale (2)
+          const relativeTop = (rect.top - cloneRect.top) * 2;
+          sectionPositions.push(relativeTop);
+        });
+
+        const pixelsPerPage = pdfHeight / ratio;
+        const pageBreaks: number[] = [0]; // Start positions for each page
+
+        let currentPos = pixelsPerPage;
+        while (currentPos < canvas.height) {
+          // Look for a section header that starts near the page break
+          // If a header is in the last 15% of the page, move break to before the header
+          const breakZoneStart = currentPos - (pixelsPerPage * 0.15);
+
+          let adjustedBreak = currentPos;
+
+          for (const headerPos of sectionPositions) {
+            // If a header would appear in the "danger zone" at bottom of page
+            if (headerPos > breakZoneStart && headerPos < currentPos) {
+              // Move page break to just before this header (with small margin)
+              adjustedBreak = headerPos - 20; // 20px margin above header
+              break;
+            }
+          }
+
+          pageBreaks.push(adjustedBreak);
+          currentPos = adjustedBreak + pixelsPerPage;
+        }
+
+        // Add final position
+        pageBreaks.push(canvas.height);
+
+        // Generate pages based on calculated break points
+        for (let page = 0; page < pageBreaks.length - 1; page++) {
           if (page > 0) {
             pdf.addPage();
           }
 
-          // Calculate slice for this page
-          const sourceY = page * pixelsPerPage;
-          const sourceHeight = Math.min(pixelsPerPage, canvas.height - sourceY);
+          const sourceY = pageBreaks[page];
+          const sourceHeight = pageBreaks[page + 1] - sourceY;
 
           // Create temporary canvas for this page
           const pageCanvas = document.createElement('canvas');
           pageCanvas.width = canvas.width;
-          pageCanvas.height = sourceHeight;
+          pageCanvas.height = Math.ceil(sourceHeight);
           const ctx = pageCanvas.getContext('2d');
 
           if (ctx) {
+            // Fill with white background first
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
             ctx.drawImage(
               canvas,
               0, sourceY, canvas.width, sourceHeight,
