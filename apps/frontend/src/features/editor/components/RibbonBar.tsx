@@ -128,63 +128,80 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
 
       const element = printRef.current;
 
-      // Create an off-screen container for the clone
-      const container = document.createElement('div');
-      container.style.cssText = `
-        position: fixed;
-        left: -9999px;
-        top: 0;
-        width: 210mm;
-        min-height: 297mm;
-        background: white;
-        z-index: -9999;
-      `;
-      document.body.appendChild(container);
+      // Store all original styles from parent containers
+      const scaledContainer = element.closest('.origin-top-left') as HTMLElement;
+      const absoluteContainer = element.closest('.absolute') as HTMLElement;
+      const overflowContainer = absoluteContainer?.parentElement as HTMLElement;
 
-      // Clone the element with all styles
-      const clone = element.cloneNode(true) as HTMLElement;
+      // Save original styles
+      const savedStyles = {
+        element: element.style.cssText,
+        scaledContainer: scaledContainer?.style.cssText || '',
+        absoluteContainer: absoluteContainer?.style.cssText || '',
+        overflowContainer: overflowContainer?.style.cssText || '',
+      };
 
-      // Reset any transforms and ensure proper layout
-      clone.style.cssText = `
-        width: 210mm !important;
-        min-height: auto !important;
-        transform: none !important;
-        position: relative !important;
-        left: auto !important;
-        top: auto !important;
-        background: white !important;
-      `;
-
-      // Remove all buttons and UI elements from the clone
-      clone.querySelectorAll('button').forEach(btn => btn.remove());
-      clone.querySelectorAll('[class*="opacity-0"]').forEach(el => el.remove());
-      clone.querySelectorAll('[draggable="true"]').forEach(el => {
-        (el as HTMLElement).removeAttribute('draggable');
+      // Hide UI elements (buttons, hover elements) by adding a class
+      const uiElements = element.querySelectorAll('button, [class*="opacity-0"], [class*="group-hover"]');
+      uiElements.forEach(el => {
+        (el as HTMLElement).style.visibility = 'hidden';
       });
 
-      container.appendChild(clone);
+      // Temporarily modify styles for capture
+      // 1. Remove overflow clipping from parent container
+      if (overflowContainer) {
+        overflowContainer.style.overflow = 'visible';
+        overflowContainer.style.height = 'auto';
+      }
 
-      // Wait for styles to apply
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // 2. Remove absolute positioning that clips content
+      if (absoluteContainer) {
+        absoluteContainer.style.position = 'relative';
+        absoluteContainer.style.inset = 'auto';
+        absoluteContainer.style.overflow = 'visible';
+      }
 
-      // Get actual dimensions
-      const cloneWidth = clone.scrollWidth;
-      const cloneHeight = clone.scrollHeight;
+      // 3. Remove scale transform and set full A4 width
+      if (scaledContainer) {
+        scaledContainer.style.transform = 'none';
+        scaledContainer.style.width = '794px'; // 210mm at 96dpi
+        scaledContainer.style.minHeight = 'auto';
+      }
 
-      // Capture at high quality
-      const canvas = await html2canvas(clone, {
+      // 4. Set element to full A4 size
+      element.style.width = '794px';
+      element.style.minHeight = 'auto';
+      element.style.transform = 'none';
+
+      // Wait for styles to apply and layout to recalculate
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Get dimensions after style changes
+      const captureWidth = element.scrollWidth;
+      const captureHeight = element.scrollHeight;
+
+      // Capture the element at high resolution
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: cloneWidth,
-        height: cloneHeight,
-        windowWidth: cloneWidth,
-        windowHeight: cloneHeight,
+        width: captureWidth,
+        height: captureHeight,
+        scrollX: 0,
+        scrollY: -window.scrollY, // Account for scroll position
       });
 
-      // Remove the temporary container
-      document.body.removeChild(container);
+      // Restore all original styles immediately
+      element.style.cssText = savedStyles.element;
+      if (scaledContainer) scaledContainer.style.cssText = savedStyles.scaledContainer;
+      if (absoluteContainer) absoluteContainer.style.cssText = savedStyles.absoluteContainer;
+      if (overflowContainer) overflowContainer.style.cssText = savedStyles.overflowContainer;
+
+      // Restore visibility of UI elements
+      uiElements.forEach(el => {
+        (el as HTMLElement).style.visibility = '';
+      });
 
       // Create PDF
       const pdf = new jsPDF({
@@ -205,10 +222,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
         pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, scaledCanvasHeight);
       } else {
-        // Multi-page: add the full image and let it flow across pages
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-        // Calculate pixels per page
+        // Multi-page: slice the canvas for each page
         const pixelsPerPage = pdfHeight / ratio;
         const totalPages = Math.ceil(canvas.height / pixelsPerPage);
 
@@ -217,9 +231,27 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
             pdf.addPage();
           }
 
-          // For each page, add the full image with negative Y offset
-          const yOffset = -(page * pdfHeight);
-          pdf.addImage(imgData, 'JPEG', 0, yOffset, pdfWidth, scaledCanvasHeight);
+          // Calculate slice for this page
+          const sourceY = page * pixelsPerPage;
+          const sourceHeight = Math.min(pixelsPerPage, canvas.height - sourceY);
+
+          // Create temporary canvas for this page
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = canvas.width;
+          pageCanvas.height = sourceHeight;
+          const ctx = pageCanvas.getContext('2d');
+
+          if (ctx) {
+            ctx.drawImage(
+              canvas,
+              0, sourceY, canvas.width, sourceHeight,
+              0, 0, canvas.width, sourceHeight
+            );
+
+            const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+            const thisPageHeight = sourceHeight * ratio;
+            pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, thisPageHeight);
+          }
         }
       }
 
