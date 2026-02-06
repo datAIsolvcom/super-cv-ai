@@ -198,42 +198,47 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       const pdfWidth = 210; // A4 width in mm
       const pdfHeight = 297; // A4 height in mm
 
-      // Calculate the image dimensions to fit the PDF width
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      // Calculate the scale ratio to fit the canvas width to A4
+      const ratio = pdfWidth / canvas.width;
+      const scaledCanvasHeight = canvas.height * ratio;
 
-      // If the image fits on one page
-      if (imgHeight <= pdfHeight) {
+      // If the content fits on one page
+      if (scaledCanvasHeight <= pdfHeight) {
         const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, scaledCanvasHeight);
       } else {
-        // Multi-page handling: split the canvas into pages
-        const pageCount = Math.ceil(imgHeight / pdfHeight);
-        const sourceImgHeight = canvas.height / pageCount;
+        // Multi-page: calculate how many pixels of canvas height fit on one A4 page
+        const pixelsPerPage = pdfHeight / ratio; // Canvas pixels per PDF page
+        const totalPages = Math.ceil(canvas.height / pixelsPerPage);
 
-        for (let i = 0; i < pageCount; i++) {
-          if (i > 0) {
+        for (let page = 0; page < totalPages; page++) {
+          if (page > 0) {
             pdf.addPage();
           }
 
-          // Create a temporary canvas for this page section
+          // Calculate the slice of the original canvas for this page
+          const sourceY = page * pixelsPerPage;
+          const sourceHeight = Math.min(pixelsPerPage, canvas.height - sourceY);
+
+          // Create a temporary canvas for this page's portion
           const pageCanvas = document.createElement('canvas');
           pageCanvas.width = canvas.width;
-          pageCanvas.height = sourceImgHeight;
+          pageCanvas.height = sourceHeight;
           const ctx = pageCanvas.getContext('2d');
 
           if (ctx) {
             // Draw the portion of the original canvas for this page
             ctx.drawImage(
               canvas,
-              0, i * sourceImgHeight, // Source x, y
-              canvas.width, sourceImgHeight, // Source width, height
-              0, 0, // Destination x, y
-              canvas.width, sourceImgHeight // Destination width, height
+              0, sourceY,                    // Source x, y
+              canvas.width, sourceHeight,    // Source width, height
+              0, 0,                           // Destination x, y
+              canvas.width, sourceHeight     // Destination width, height
             );
 
             const pageImgData = pageCanvas.toDataURL('image/jpeg', 0.95);
-            pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+            const thisPageHeight = sourceHeight * ratio; // Scaled height for this page
+            pdf.addImage(pageImgData, 'JPEG', 0, 0, pdfWidth, thisPageHeight);
           }
         }
       }
