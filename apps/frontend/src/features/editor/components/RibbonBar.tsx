@@ -137,29 +137,40 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       const originalLeft = element.style.left;
       const originalTop = element.style.top;
 
-      // Find the parent container that has the scale transform
+      // Find the parent container that has the scale transform (the one with origin-top-left class)
       const scaledContainer = element.closest('.origin-top-left') as HTMLElement;
       const originalContainerTransform = scaledContainer?.style.transform || '';
       const originalContainerWidth = scaledContainer?.style.width || '';
       const originalContainerMinHeight = scaledContainer?.style.minHeight || '';
 
-      // Temporarily remove transforms and set full size for proper capture
+      // Also find the absolute positioned container that clips the content on mobile
+      const absoluteContainer = element.closest('.absolute.inset-0') as HTMLElement;
+      const originalAbsolutePosition = absoluteContainer?.style.position || '';
+      const originalAbsoluteOverflow = absoluteContainer?.style.overflow || '';
+
+      // Temporarily modify styles to render at full A4 size
+      if (absoluteContainer) {
+        absoluteContainer.style.position = 'relative';
+        absoluteContainer.style.overflow = 'visible';
+      }
+
       if (scaledContainer) {
         scaledContainer.style.transform = 'none';
-        scaledContainer.style.width = '794px'; // A4 width at 96 DPI
+        scaledContainer.style.width = '210mm';  // Use same width as desktop
         scaledContainer.style.minHeight = 'auto';
       }
+
       element.style.transform = 'none';
-      element.style.width = '794px'; // A4 width at 96 DPI
+      element.style.width = '210mm';  // Match the CSS class w-[210mm]
       element.style.minHeight = 'auto';
       element.style.position = 'relative';
       element.style.left = 'auto';
       element.style.top = 'auto';
 
       // Wait for the styles to apply and layout to recalculate
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Get the actual dimensions of the content
+      // Get the actual dimensions of the content after styles are applied
       const elementWidth = element.scrollWidth;
       const elementHeight = element.scrollHeight;
 
@@ -176,6 +187,10 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
       });
 
       // Restore original styles
+      if (absoluteContainer) {
+        absoluteContainer.style.position = originalAbsolutePosition;
+        absoluteContainer.style.overflow = originalAbsoluteOverflow;
+      }
       if (scaledContainer) {
         scaledContainer.style.transform = originalContainerTransform;
         scaledContainer.style.width = originalContainerWidth;
