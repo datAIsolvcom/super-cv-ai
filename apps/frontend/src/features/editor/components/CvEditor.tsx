@@ -188,11 +188,11 @@ export function CvEditor({ printRef, highlightSection, isPreviewMode = false }: 
       <header className={`border-b-2 pb-4 mb-4 flex flex-col items-center text-center ${template === "minimal" ? "items-start text-left border-none" : ""}`} style={{ borderColor: design.accentColor }}>
         <Field tagName="h1" className="text-[2.5em] font-bold uppercase tracking-wider mb-2 leading-none" style={{ color: design.accentColor || '#000000' }} value={cvData.full_name || "Name"} onSave={(v) => updateCvField("full_name", v)} />
         <div className={`flex flex-wrap gap-x-4 gap-y-1 text-[0.9em] text-slate-600 ${template === "minimal" ? "justify-start" : "justify-center"}`}>
-          {contact.email && <div className="flex items-center gap-1"><Mail size={14} className="shrink-0" /><Field tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
-          {contact.phone && <div className="flex items-center gap-1"><Phone size={14} className="shrink-0" /><Field tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
-          {contact.location && <div className="flex items-center gap-1"><MapPin size={14} className="shrink-0" /><Field tagName="span" value={contact.location} onSave={(v) => updateCvField("contact_info.location", v)} /></div>}
-          {contact.linkedin && <div className="flex items-center gap-1"><Linkedin size={14} className="shrink-0" /><Field tagName="span" value={contact.linkedin} onSave={(v) => updateCvField("contact_info.linkedin", v)} /></div>}
-          {contact.portfolio && <div className="flex items-center gap-1"><Globe size={14} className="shrink-0" /><Field tagName="span" value={contact.portfolio} onSave={(v) => updateCvField("contact_info.portfolio", v)} /></div>}
+          {contact.email && <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', lineHeight: '1.4' }}><Mail size={14} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }} /><Field tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
+          {contact.phone && <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', lineHeight: '1.4' }}><Phone size={14} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }} /><Field tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
+          {contact.location && <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', lineHeight: '1.4' }}><MapPin size={14} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }} /><Field tagName="span" value={contact.location} onSave={(v) => updateCvField("contact_info.location", v)} /></div>}
+          {contact.linkedin && <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', lineHeight: '1.4' }}><Linkedin size={14} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }} /><Field tagName="span" value={contact.linkedin} onSave={(v) => updateCvField("contact_info.linkedin", v)} /></div>}
+          {contact.portfolio && <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', lineHeight: '1.4' }}><Globe size={14} style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }} /><Field tagName="span" value={contact.portfolio} onSave={(v) => updateCvField("contact_info.portfolio", v)} /></div>}
         </div>
       </header>
 
@@ -235,11 +235,24 @@ function SectionHeader({ title, onSave, design, className, Field, children }: {
   children?: React.ReactNode;
 }) {
   return (
-    <div className={cn("flex justify-between items-center mb-2 border-b pb-1", className)} style={{ borderColor: design.accentColor }}>
+    <div
+      className={cn("flex justify-between items-center mb-2", className)}
+      style={{
+        borderBottom: `1px solid ${design.accentColor}`,
+        paddingBottom: '4px',
+        position: 'relative',
+      }}
+    >
       <Field
         tagName="h2"
         className="text-[0.9em] font-bold uppercase tracking-widest"
-        style={{ color: design.accentColor }}
+        style={{
+          color: design.accentColor,
+          backgroundColor: 'white',
+          paddingRight: '8px',
+          position: 'relative',
+          zIndex: 1,
+        }}
         value={title}
         onSave={onSave}
       />
