@@ -187,12 +187,12 @@ export function CvEditor({ printRef, highlightSection, isPreviewMode = false }: 
     >
       <header className={`border-b-2 pb-4 mb-4 flex flex-col items-center text-center ${template === "minimal" ? "items-start text-left border-none" : ""}`} style={{ borderColor: design.accentColor }}>
         <Field tagName="h1" className="text-[2.5em] font-bold uppercase tracking-wider mb-2 leading-none" style={{ color: design.accentColor || '#000000' }} value={cvData.full_name || "Name"} onSave={(v) => updateCvField("full_name", v)} />
-        <div className={`flex flex-wrap gap-x-4 gap-y-1 text-[0.9em] text-slate-600 ${template === "minimal" ? "justify-start" : "justify-center"}`}>
-          {contact.email && <div className="flex items-center gap-1"><Mail size={14} className="shrink-0" style={{ position: 'relative', top: '3px' }} /><Field tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
-          {contact.phone && <div className="flex items-center gap-1"><Phone size={14} className="shrink-0" style={{ position: 'relative', top: '3px' }} /><Field tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
-          {contact.location && <div className="flex items-center gap-1"><MapPin size={14} className="shrink-0" style={{ position: 'relative', top: '3px' }} /><Field tagName="span" value={contact.location} onSave={(v) => updateCvField("contact_info.location", v)} /></div>}
-          {contact.linkedin && <div className="flex items-center gap-1"><Linkedin size={14} className="shrink-0" style={{ position: 'relative', top: '4px' }} /><Field tagName="span" value={contact.linkedin} onSave={(v) => updateCvField("contact_info.linkedin", v)} /></div>}
-          {contact.portfolio && <div className="flex items-center gap-1"><Globe size={14} className="shrink-0" style={{ position: 'relative', top: '5px' }} /><Field tagName="span" value={contact.portfolio} onSave={(v) => updateCvField("contact_info.portfolio", v)} /></div>}
+        <div className={`flex flex-wrap gap-x-4 gap-y-2 text-[0.9em] text-slate-600 pt-1 ${template === "minimal" ? "justify-start" : "justify-center"}`} style={{ overflow: 'visible' }}>
+          {contact.email && <div className="flex items-center gap-1" style={{ overflow: 'visible' }}><Mail size={14} className="shrink-0" style={{ marginTop: '2px' }} /><Field tagName="span" value={contact.email} onSave={(v) => updateCvField("contact_info.email", v)} /></div>}
+          {contact.phone && <div className="flex items-center gap-1" style={{ overflow: 'visible' }}><Phone size={14} className="shrink-0" style={{ marginTop: '3px' }} /><Field tagName="span" value={contact.phone} onSave={(v) => updateCvField("contact_info.phone", v)} /></div>}
+          {contact.location && <div className="flex items-center gap-1" style={{ overflow: 'visible' }}><MapPin size={14} className="shrink-0" style={{ marginTop: '4px' }} /><Field tagName="span" value={contact.location} onSave={(v) => updateCvField("contact_info.location", v)} /></div>}
+          {contact.linkedin && <div className="flex items-center gap-1" style={{ overflow: 'visible' }}><Linkedin size={14} className="shrink-0" style={{ marginTop: '5px' }} /><Field tagName="span" value={contact.linkedin} onSave={(v) => updateCvField("contact_info.linkedin", v)} /></div>}
+          {contact.portfolio && <div className="flex items-center gap-1" style={{ overflow: 'visible' }}><Globe size={14} className="shrink-0" style={{ marginTop: '6px' }} /><Field tagName="span" value={contact.portfolio} onSave={(v) => updateCvField("contact_info.portfolio", v)} /></div>}
         </div>
       </header>
 
