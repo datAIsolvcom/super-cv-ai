@@ -114,7 +114,7 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
     },
   });
 
-  // Mobile PDF generation using html2pdf.js
+  // Mobile PDF generation using html2canvas + jsPDF directly
   const generateMobilePdf = async () => {
     if (!printRef.current) return;
 
@@ -122,50 +122,67 @@ export function RibbonBar({ printRef, isPreviewMode, setIsPreviewMode }: RibbonB
     setShowPrintHelp(false);
 
     try {
-      // Dynamically import html2pdf.js
-      const html2pdf = (await import('html2pdf.js')).default;
+      // Dynamically import html2canvas and jsPDF
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
 
-      // Clone the element to avoid modifying the original
-      const element = printRef.current.cloneNode(true) as HTMLElement;
+      // Get reference to the actual CV content element
+      const element = printRef.current;
 
-      // Apply full-size styling to the clone
+      // Store original styles to restore later
+      const originalTransform = element.style.transform;
+      const originalWidth = element.style.width;
+      const originalMinHeight = element.style.minHeight;
+
+      // Find the parent container that has the scale transform
+      const scaledContainer = element.closest('.origin-top-left') as HTMLElement;
+      const originalContainerTransform = scaledContainer?.style.transform || '';
+
+      // Temporarily remove transforms and set full size
+      if (scaledContainer) {
+        scaledContainer.style.transform = 'none';
+      }
       element.style.transform = 'none';
       element.style.width = '210mm';
       element.style.minHeight = '297mm';
-      element.style.padding = '10mm';
-      element.style.background = 'white';
-      element.style.color = 'black';
-      element.style.position = 'absolute';
-      element.style.left = '-9999px';
-      element.style.top = '0';
 
-      // Apply computed styles to ensure proper rendering
-      document.body.appendChild(element);
+      // Wait for the styles to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      const opt = {
-        margin: 0,
-        filename: 'My_CV.pdf',
-        image: { type: 'jpeg' as const, quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          letterRendering: true,
-          logging: false,
-          windowWidth: 794, // A4 width in pixels at 96 DPI
-          windowHeight: 1123, // A4 height in pixels at 96 DPI
-        },
-        jsPDF: {
-          unit: 'mm' as const,
-          format: 'a4' as const,
-          orientation: 'portrait' as const
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-      };
+      // Capture the element at high resolution
+      const canvas = await html2canvas(element, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: 794, // A4 width in pixels at 96 DPI
+        height: 1123, // A4 height in pixels at 96 DPI
+        windowWidth: 794,
+        windowHeight: 1123,
+      });
 
-      await html2pdf().set(opt).from(element).save();
+      // Restore original styles
+      if (scaledContainer) {
+        scaledContainer.style.transform = originalContainerTransform;
+      }
+      element.style.transform = originalTransform;
+      element.style.width = originalWidth;
+      element.style.minHeight = originalMinHeight;
 
-      // Clean up
-      document.body.removeChild(element);
+      // Create PDF from canvas
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Add the image to cover the full A4 page
+      pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+
+      // Save the PDF
+      pdf.save('My_CV.pdf');
+
     } catch (error) {
       console.error('PDF generation failed:', error);
       alert('Failed to generate PDF. Please try again.');
